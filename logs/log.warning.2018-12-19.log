@@ -1,0 +1,4 @@
+2018/12/17 14:16:43.819 [W] [beego.go:97] template: LayoutAdmin.tpl:65: function "v" not defined
+2018/12/17 14:54:32.463 [W] [beego.go:97] template: LayoutAdmin.tpl:65: function "v" not defined
+2018/12/17 15:50:29.082 [W] [beego.go:97] template: admincontroller/systemconfig.tpl:4: function "i18n" not defined
+2018/12/18 17:34:02.823 [W] [beego.go:97] template: modal.tpl:13: function "i18n" not defined

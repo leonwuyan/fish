@@ -1,0 +1,2 @@
+2018/12/23 16:37:41.621 [W] [beego.go:97] template: admincontroller/recharge.tpl:4: function "i18n" not defined
+2018/12/23 16:38:30.103 [W] [beego.go:97] template: admincontroller/recharge.tpl:4: function "i18n" not defined

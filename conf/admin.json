@@ -1,0 +1,22 @@
+{
+  "Admin": {
+    "AdminAccount_List": 205
+  },
+  "Player": {
+    "Player_List": 301
+  },
+  "Agent": {
+    "Agent_List": 401,
+    "Agent_Add": 402,
+    "Agent_Edit": 403,
+    "Agent_Bind_Parent": 405,
+    "Agent_Apply_List": 406,
+    "Agent_Cash_List": 407
+  },
+  "System": {
+    "SystemCfg": 101
+  },
+  "Recharge": {
+    "Recharge": 501
+  }
+}
