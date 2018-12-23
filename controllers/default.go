@@ -13,11 +13,6 @@ type MainController struct {
 	baseController
 }
 
-func (c *MainController) Index() {
-	c.Data["Website"] = "beego.me"
-	c.Data["Email"] = "astaxie@gmail.com"
-	c.TplName = "index.tpl"
-}
 func (c *MainController) Advertise() {
 	temp_id, _ := c.GetInt("template_id")
 	agentId, _ := c.GetInt("agentId")

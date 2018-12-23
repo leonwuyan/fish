@@ -179,6 +179,15 @@ type BankCardConfig struct {
 	BankCode       string `orm:"column(BankCode)" json:"bank_code"`
 	IsEnabled      bool   `orm:"column(IsEnabled)" json:"is_enabled"`
 }
+type AgentCashInfo struct {
+	AgentId        int    `orm:"column();pk;" json:"agent_id"`
+	Alipay         string `orm:"column()" json:"alipay"`
+	AlipayRealName string `orm:"column()" json:"alipay_real_name"`
+	BankType       int    `orm:"column()" json:"bank_type"`
+	BankInfo       string `orm:"column()" json:"bank_info"`
+	BankCardNo     string `orm:"column()" json:"bank_card_no"`
+	BankRealName   string `orm:"column()" json:"bank_real_name"`
+}
 
 func (this *PlayLog) TableName() string {
 	return "playlog"

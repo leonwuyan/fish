@@ -210,6 +210,38 @@ func (c *AgentController) Cash() {
 		c.ServeJSON()
 	}
 }
+func (c *AgentController) BindCashInfo() {
+	if c.Ctx.Input.IsPost() {
+		bindType, _ := c.GetInt("bindType")
+		var agentBankInfo models.AgentCashInfo
+		switch enums.CashType(bindType) {
+		case enums.CASH_TYPE_ALIPAY:
+			alipay := c.GetString("alipay")
+			realName := c.GetString("real_name")
+			agentBankInfo = models.AgentCashInfo{
+				AgentId:        c.agent.Id,
+				Alipay:         alipay,
+				AlipayRealName: realName,
+			}
+			break
+		case enums.CASH_TYPE_BANKCARD:
+			bankType, _ := c.GetInt("bank_type")
+			BankInfo := c.GetString("bank_info")
+			bankCardNo := c.GetString("bank_card_no")
+			realName := c.GetString("real_name")
+			agentBankInfo = models.AgentCashInfo{
+				AgentId:      c.agent.Id,
+				BankType:     bankType,
+				BankInfo:     BankInfo,
+				BankCardNo:   bankCardNo,
+				BankRealName: realName,
+			}
+			break
+		}
+		c.Data["json"] = managers.AgentInstance.BindCashInfo(c.agent, agentBankInfo)
+		c.ServeJSON()
+	}
+}
 func (c *AgentController) checkAgent(agent models.AgentAccount, pwd string) enums.ReturnCode {
 	//if !agent. {
 	//	return enums.AGENT_UNUSED

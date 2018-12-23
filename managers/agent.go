@@ -169,6 +169,28 @@ func (this *AgentMgr) GetCashLog(agent models.AgentAccount, pageSize, pageIndex 
 	}
 	return
 }
+func (this *AgentMgr) GetCashInfo(account models.AgentAccount) (info models.AgentCashInfo) {
+	o := orm.NewOrm()
+	if err := o.QueryTable(info).Filter("Id", account.Id).One(&info); err != nil {
+		return models.AgentCashInfo{AgentId: account.Id}
+	}
+	return
+}
+func (this *AgentMgr) BindCashInfo(account models.AgentAccount, bankInfo models.AgentCashInfo) enums.ReturnCode {
+	o := orm.NewOrm()
+	var agentBankInfo models.AgentCashInfo
+	if err := o.QueryTable(agentBankInfo).Filter("Id", account.Id).One(&agentBankInfo); err != nil {
+		if _, err := o.Insert(&bankInfo); err != nil {
+			return enums.DB_ACTION_ERROR
+		}
+	} else {
+		agentBankInfo = bankInfo
+		if _, err := o.Update(agentBankInfo); err != nil {
+			return enums.DB_ACTION_ERROR
+		}
+	}
+	return enums.SUCCESS
+}
 
 func (this *AgentMgr) ChangeChildRate(account models.AgentAccount, id, rate int) enums.ReturnCode {
 	o := orm.NewOrm()
