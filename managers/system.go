@@ -41,12 +41,7 @@ func (this *SystemMgr) PreRecharge(userId, channel, payType, amount int, payOrde
 func (this *SystemMgr) FinishRecharge(payOrder string) (err error) {
 	o := orm.NewOrm()
 	var rechargeData models.RechargeLog
-	if err = o.QueryTable(rechargeData).Filter("TransactionId", payOrder).One(&rechargeData); err != nil {
-		return
-	}
-	rechargeData.Finished = 1
-	rechargeData.FinishTime = time.Now()
-	if _, err = o.Update(&rechargeData, "Finished", "FinishTime"); err != nil {
+	if _, err = o.QueryTable(rechargeData).Filter("TransactionId", payOrder).Update(orm.Params{"Finished": 1, "FinishTime": time.Now()}); err != nil {
 		return
 	}
 	return
@@ -66,9 +61,4 @@ func (this *SystemMgr) ChangeConfig(key, value string) (err error) {
 		err = beego.AppConfig.SaveConfigFile("conf/app.conf")
 	}
 	return
-}
-
-func (this *SystemMgr) LoadBankCardConfig() {
-	o := orm.NewOrm()
-	o.QueryTable(new(models.BankCardConfig)).All(&BankConfig)
 }

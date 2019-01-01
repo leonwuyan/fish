@@ -21,8 +21,7 @@ func RegisterDB() {
 		new(User2Agent),
 		new(RechargeLog),
 		new(PlayerAccount),
-		new(BankCardConfig),
-		new(AgentCashInfo),
+		new(BankCardInfo),
 	)
 	orm.RunSyncdb("default", false, true)
 	orm.Debug = beego.BConfig.RunMode == "dev"

@@ -21,7 +21,7 @@
                             <li>
                                 <strong>可提现金额：</strong>
                                 <span id="gold" class="fa fa-diamond" style="margin:0 10px 0 10px;font-size: 18px"> <strong id="gold"></strong></span>
-                                <a class="btn btn-danger" style="margin-right: 15px" href="{{.host}}cash">立即提取</a></li>
+                                <a class="btn btn-danger" style="margin-right: 15px" href="{{.host}}cash/apply">立即提取</a></li>
                         </ul>
                     </div>
                 </div>

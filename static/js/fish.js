@@ -108,16 +108,7 @@ var fishApp = {
                 break;
         }
         if (confirm(confirmMsg)) {
-            $.post(location.href, {"action": "action", "id": id, "state": state}, function (result) {
-                if (checkLogin(result.state)) {
-                    if (result.state === 0) {
-                        toastr.success("提交成功");
-                        $('#dataTable').bootstrapTable('refresh', {url: dataurl});
-                    } else {
-                        toastr.error("提交失败，" + result.msg)
-                    }
-                }
-            })
+            this.putAction(location.href, {"action": "action", "id": id, "state": state});
         }
     },
     rechargeAction: function (params) {
@@ -131,7 +122,7 @@ var fishApp = {
             }
         });
     },
-    putAction: function (utl, params) {
+    putAction: function (url, params) {
         $.ajax({
             url: url,
             method: "put",
@@ -152,10 +143,12 @@ var fishApp = {
     formatter: {
         cashType: function (t) {
             switch (t) {
-                case 1:
+                case 0:
                     return "支付宝";
-                case 2:
+                case 1:
                     return "银行卡";
+                case 2:
+                    return "代理商";
             }
         },
         cashState: function (value) {
@@ -172,15 +165,85 @@ var fishApp = {
                     return "<b class='text-danger'>退款</b>";
             }
         },
+        cashInfo: function (value, row) {
+            switch (row.tx_type) {
+                case 0:
+                    return "支付宝账号：" + row.alipay + "<br>支付宝姓名：" + row.alipay_name;
+                case 1:
+                    return "银行：" + fishApp.formatter.bankType(row.bank_card_type_id) + "<br/>卡号：" + row.bank_card_no + "<br>真实姓名：" + row.real_name;
+            }
+        },
         bankType: function (b) {
             switch (b) {
-                case 1:
-                    return "工商银行";
+                case 1:                    return "工商银行";
+                case   2:                    return "农业银行";
+                case   3    :                    return "中国银行";
+                case   4    :                    return "建设银行";
+                case   5    :                    return "招商银行";
+                case  6    :                    return "交通银行";
+                case   7    :                    return "光大银行";
+                case 8    :                    return "华夏银行";
+                case 9    :                    return "广发银行";
+                case 10    :                    return "北京银行";
+                case 11    :                    return "北京农商行";
+                case 12    :                    return "上海银行";
+                case 13    :                    return "上海农商银行";
+                case  14    :                    return "渤海银行";
+                case 15    :                    return "杭州银行";
+                case 16    :                    return "广州市商业银行";
+                case 17    :                    return "中信银行";
+                case 18    :                    return "中国邮储银行";
+                case 19    :                    return "兴业银行";
+                case 20    :                    return "民生银行";
+                case  21    :                    return "平安银行";
+                case  22    :                    return "浦发银行";
+                case    23    :                    return "杭州联合银行";
+                case   24    :                    return "宁波银行";
+                case   25    :                    return "南京银行";
+                case   26    :                    return "温州市商业银行";
+                case    27    :                    return "长沙银行";
+                case    28    :                    return "集友银行";
+                case   29    :                    return "浙商银行";
+                case   30    :                    return "浙江稠州商业银行";
+                case   31    :                    return "广州市农信社";
+                case   32    :                    return "汉口银行";
             }
         },
         gold: function (value) {
             return (value / 100).toFixed(2);
+        },
+        rate: function (value) {
+            return value + "%"
         }
+    },
+    getGameName: function (id) {
+        switch (id) {
+            case 1:
+                return "捕鱼";
+            case 2:
+                return "扎金花";
+            case 3:
+                return "斗地主";
+            case 4:
+                return "百人牛牛";
+            case 5:
+                return "红黑大战";
+            case 6:
+                return "抢庄牛牛";
+            case 7:
+                return "龙虎斗";
+        }
+    },
+    bankInfo: function () {
+        $.post(location.href, function (result) {
+            if (checkLogin(result.state)) {
+                if (result.data.length === 0) {
+                    //添加
+                } else {
+                    bank_info
+                }
+            }
+        })
     }
 };
 

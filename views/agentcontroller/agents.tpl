@@ -71,12 +71,10 @@
         {title: '注册时间', field: 'register_time'},
         {
             title: '操作', formatter: function (value, row) {
-                return '<a data-toggle="modal" data-target="#data-modal" data-remote="{{.domain}}forms/?a=change_rate&id=' + row.id + '&rate=' + {{.user.Rate}} + '">修改提成</a> <a href="{{.host}}childtax?id=' + row.id + '">收入明细</a>'
+                return '<a href="{{.host}}childtax?id=' + row.id + '">收入明细</a>'
             }
         }
     ];
     dataurl = location.href;
-</script>
-<script>
     fishApp.dataPage();
 </script>

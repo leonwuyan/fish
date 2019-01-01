@@ -31,6 +31,7 @@ func init() {
 	cpt.StdWidth = 100
 	beego.AddFuncMap("year", time.Now().Year)
 	beego.AddFuncMap("v", verifyPower)
+	beego.AddFuncMap("today", time.Today)
 }
 func (c *baseController) Prepare() {
 	c.Data["rand"] = rand.Int()
@@ -74,7 +75,7 @@ func createPostForm(c *baseController, items []map[string]interface{}) {
 	sliderFormatter := "<input class=\"form-control\" type=\"slider\" id=\"%s\" name=\"%s\" data-slider-min=\"%s\" data-slider-max=\"%s\" data-slider-step=\"%s\" data-slider-value=\"%s\" data-slider-can-min=\"%s\"/><span class=\"input-group-addon\" style=\"width: 65px\"><span id=\"%s_val\">%s</span></span>"
 	selectFormatter := "<select class=\"form-control\" id=\"%s\" name=\"%s\">%s</select>"
 	optionFormatter := "<option value=\"%d\"%s>%s</option>"
-	//checkboxFormatter := "<div class=\"col-sm-6 col-md-4 col-lg-4\"><label class=\"checkbox-inline\"><input type=\"checkbox\" name=\"%s\" value=\"%d\"%s>%s</label></div>"
+	checkboxFormatter := "<div class=\"col-sm-6 col-md-4 col-lg-4\"><label class=\"checkbox-inline\"><input type=\"checkbox\" name=\"%s\" value=\"%d\"%s>%s</label></div>"
 	radioFormatter := "<input class=\"form-control\" type=\"radio\" name=\"%s\" value=\"%s\"%s>%s"
 	var html template.HTML
 	for _, v := range items {
@@ -132,7 +133,7 @@ func createPostForm(c *baseController, items []map[string]interface{}) {
 				for _, group := range groups {
 					cls := "form-control-group"
 					groupHtml := "<div class=\"" + cls + "\">"
-					//groupHtml += "<p>" + i18n.Tr(c.Lang, "power."+group) + "</p>"
+					groupHtml += "<p>" + group + "</p>"
 					itemsHtml := ""
 					var items []string
 					for item := range checkbox_items[group] {
@@ -150,9 +151,9 @@ func createPostForm(c *baseController, items []map[string]interface{}) {
 							}
 						}
 						if item_checked {
-							//checkboxItem = fmt.Sprintf(checkboxFormatter, v["id"], checkbox_items[group][item], "checked", i18n.Tr(c.Lang, "power."+item))
+							checkboxItem = fmt.Sprintf(checkboxFormatter, v["id"], checkbox_items[group][item], "checked", item)
 						} else {
-							//checkboxItem = fmt.Sprintf(checkboxFormatter, v["id"], checkbox_items[group][item], "", i18n.Tr(c.Lang, "power."+item))
+							checkboxItem = fmt.Sprintf(checkboxFormatter, v["id"], checkbox_items[group][item], "", item)
 						}
 						groupHtml += checkboxItem
 					}

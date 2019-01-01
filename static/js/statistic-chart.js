@@ -4,7 +4,7 @@ function drawLine(el, dataTable) {
     labels = [];
     visibleCols = dataTable.bootstrapTable('getVisibleColumns');
     for (i in visibleCols) {
-        if (visibleCols[i].field !== "note_time" && visibleCols[i].field !== undefined) {
+        if (visibleCols[i].field !== "StatDate" && visibleCols[i].field !== undefined) {
             cols.push(visibleCols[i].field);
             labels.push(visibleCols[i].title);
         }
@@ -13,7 +13,7 @@ function drawLine(el, dataTable) {
     Morris.Line({
         element: el,
         data: dataTable.bootstrapTable('getData'),
-        xkey: 'note_time',
+        xkey: 'StatDate',
         ykeys: cols,
         labels: labels,
         lineWidth: 2,

@@ -3,10 +3,10 @@ const tool = {
     userAgent: navigator.userAgent,
 
     isiOSAutoDownload: false, // if true, auto download ios package
-    iosDownloadUrl: 'itms-services://?action=download-manifest&url=https://cdn.g97767.cn/15908-1545311396.plist',
+    iosDownloadUrl: 'itms-services://?action=download-manifest&url=https://leffs.cn/data/attachment/1621-1545824893.plist',
 
     isAndroidAutoDownload: false, // if true, auto download android package
-    androidDownloadUrl: '#',
+    androidDownloadUrl: 'http://dl.lsfpb.cn/freegame.apk',
 
     isPCAutoDownload: false,// if true, auto download android package on PC
 

@@ -23,3 +23,8 @@ func (c *ErrorController) Error10002() {
 	c.Data["content"] = "无效的充值渠道"
 	c.TplName = "error.tpl"
 }
+func (c *ErrorController) Error10003() {
+	c.Data["code"] = 10003
+	c.Data["content"] = "没有权限访问该页面"
+	c.TplName = "error.tpl"
+}

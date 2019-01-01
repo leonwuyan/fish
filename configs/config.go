@@ -11,7 +11,9 @@ var Db, _ = beego.AppConfig.GetSection("db")
 var Data, _ = beego.AppConfig.GetSection("data")
 var Domain, _ = beego.AppConfig.GetSection("domain")
 var Sms, _ = beego.AppConfig.GetSection("sms")
+var PaymentGate, _ = beego.AppConfig.GetSection("payment")
 var AdminPower map[string]map[string]int
+var TaskEnabled, _ = beego.AppConfig.Bool("task_enabled")
 
 func loadPermissions() {
 	data, err := ioutil.ReadFile("conf/admin.json")

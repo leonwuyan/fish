@@ -20,7 +20,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/static/js/bootstrap-table/bootstrap-table.js"></script>
     <script src="/static/js/bootstrap-table/i18n/bootstrap-table-zh-cn.js"></script>
-    <script src="/static/js/fish.js"></script>
+    <script src="/static/js/fish.js?"></script>
     <script>
         toastr.options.positionClass = 'toast-center-center';
     </script>

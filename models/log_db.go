@@ -50,15 +50,24 @@ type AdminRechargeLog struct {
 	IsProcessed    bool      `orm:"column(IsProcessed);" json:"is_processed"`
 	RechargeUserId int64     `orm:"column(RechargeUserId);size(20);" json:"recharge_user_id"`
 }
+type AdminActionLog struct {
+	Id            int
+	AdminId       int
+	AdminName     string
+	ActionType    int
+	ActionContent string
+	ActionTime    time.Time
+}
+
 type PlayLog struct {
-	Id         int       `orm:"column(Id)"`
-	GameLogId  string    `orm:"column(GameLogId)"`
-	StartGold  int64     `orm:"column(StartGold)"`
-	GoldChange int64     `orm:"column(GoldChange)"`
-	CreateTime time.Time `orm:"column(CreateTime)"`
-	UserId     int       `orm:"column(UserId)"`
-	GameId     int       `orm:"column(GameId)"`
-	RoomId     int       `orm:"column(RoomId)"`
+	Id         int       `orm:"column(Id)" json:"id"`
+	GameLogId  string    `orm:"column(GameLogId)" json:"game_log_id"`
+	StartGold  int64     `orm:"column(StartGold)" json:"start_gold"`
+	GoldChange int64     `orm:"column(GoldChange)" json:"gold_change"`
+	CreateTime time.Time `orm:"column(CreateTime)" json:"create_time"`
+	UserId     int       `orm:"column(UserId)" json:"user_id"`
+	GameId     int       `orm:"column(GameId)" json:"game_id"`
+	RoomId     int       `orm:"column(RoomId)" json:"room_id"`
 }
 type AgentFeeLog struct {
 	Id         int       `orm:"column(id)" json:"id"`
@@ -138,8 +147,9 @@ type AgentCashLog struct {
 	TxType             int       `orm:"column(tx_type)" json:"tx_type"`
 	BankCardTypeId     int       `orm:"column(bank_type)" json:"bank_card_type_id"`
 	BankCardNo         string    `orm:"column(bank_card_no)" json:"bank_card_no"`
-	Alipay             string    `orm:"column(alipay)" json:"alipay"`
 	RealName           string    `orm:"column(real_name)" json:"real_name"`
+	Alipay             string    `orm:"column(alipay)" json:"alipay"`
+	AlipayName         string    `orm:"column(alipay_name)" json:"alipay_name"`
 	Mobile             string    `orm:"column(mobile)" json:"mobile"`
 	WithdrawalsLogTime time.Time `orm:"column(WithdrawalsLogTime)" json:"withdrawals_log_time"`
 	State              byte      `orm:"column(state)" json:"state"`
@@ -179,14 +189,15 @@ type BankCardConfig struct {
 	BankCode       string `orm:"column(BankCode)" json:"bank_code"`
 	IsEnabled      bool   `orm:"column(IsEnabled)" json:"is_enabled"`
 }
-type AgentCashInfo struct {
-	AgentId        int    `orm:"column();pk;" json:"agent_id"`
-	Alipay         string `orm:"column()" json:"alipay"`
-	AlipayRealName string `orm:"column()" json:"alipay_real_name"`
-	BankType       int    `orm:"column()" json:"bank_type"`
-	BankInfo       string `orm:"column()" json:"bank_info"`
-	BankCardNo     string `orm:"column()" json:"bank_card_no"`
-	BankRealName   string `orm:"column()" json:"bank_real_name"`
+type BankCardInfo struct {
+	Id         int    `orm:"column(id)" json:"id"`
+	AgentId    int    `orm:"column(agent_id)" json:"agent_id"`
+	CashType   int    `orm:"column(cash_type)" json:"cash_type"`
+	BankType   int    `orm:"column(bank_type)" json:"bank_card_type_id"`
+	BankName   string `orm:"column(bank_name)" json:"bank_name"`
+	BankCardNo string `orm:"column(bank_card_no)" json:"bank_card_no"`
+	RealName   string `orm:"column(real_name)" json:"real_name"`
+	IsDefault  bool   `orm:"column(is_default)" json:"is_default"`
 }
 
 func (this *PlayLog) TableName() string {

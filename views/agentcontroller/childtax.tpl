@@ -27,49 +27,14 @@
         {title: '玩家昵称', field: 'user_name'},
         {
             title: '游戏', formatter: function (value, row) {
-                return getGameName(row.game_id) + ":房间:" + row.room_id;
+                return fishApp.getGameName(row.game_id) + ":房间:" + row.room_id;
             }
         },
-        {title: '总税收', field: 'tax', formatter: goldFormatter},
-        {
-            title: '提成比例', field: 'rate', formatter: function (value) {
-                return value + '%'
-            }
-        },
-        {
-            title: '下级分成比例', field: 'child_rate', formatter: function (value) {
-                return value + '%'
-            }
-        },
-        {title: '我的收入', field: 'fee', formatter: goldFormatter},
+        {title: '总税收', field: 'tax', formatter: fishApp.formatter.gold},
+        {title: '提成比例', field: 'rate', formatter: fishApp.formatter.rate},
+        {title: '下级分成比例', field: 'child_rate', formatter: fishApp.formatter.rate},
+        {title: '我的收入', field: 'fee', formatter: fishApp.formatter.gold},
     ];
     dataurl = location.href;
-    showFooter = false;
-
-    function getGameName(id) {
-        switch (id) {
-            case 1:
-                return "捕鱼";
-            case 2:
-                return "扎金花";
-            case 3:
-                return "斗地主";
-            case 4:
-                return "百人牛牛";
-            case 5:
-                return "红黑大战";
-            case 6:
-                return "抢庄牛牛";
-            case 7:
-                return "龙虎斗";
-        }
-    }
-
-    function goldFormatter(value) {
-        return (value / 100).toFixed(2)
-    }
-</script>
-<script src="/static/js/fish.js?{{.rand}}"></script>
-<script>
     fishApp.dataPage();
 </script>

@@ -16,7 +16,7 @@
     <script src="/static/js/bootstrap-slider/bootstrap-slider.js"></script>
     <script src="/static/js/jquery.cookie.js"></script>
     <script src="/static/js/jquery.metisMenu.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" rel="stylesheet"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/static/js/bootstrap-table/bootstrap-table.js"></script>
     <script src="/static/js/bootstrap-table/i18n/bootstrap-table-zh-cn.js"></script>
@@ -69,12 +69,12 @@
                 <li>
                     <a href="{{.host}}"><i class="fa fa-home"></i> 首页</a>
                 </li>
-            {{if v .user .powers.Admin.AdminAccount_List}}
+            {{if v .user .powers.管理员.管理员列表}}
                 <li>
-                    <a href="{{.host}}account"><i class="fa fa-user-o"></i> 账号管理</a>
+                    <a href="{{.host}}admin/list"><i class="fa fa-user-o"></i> 账号管理</a>
                 </li>
             {{end}}
-            {{if v .user .powers.Player.Player_List}}
+            {{if v .user .powers.玩家.玩家列表}}
                 <li>
                     <a href="#"><i class="fa fa-user"></i> 玩家管理<span
                             class="fa arrow"></span></a>
@@ -82,13 +82,15 @@
                         <li>
                             <a href="{{.host}}player/list">玩家列表</a>
                         </li>
+                    {{if v .user .powers.玩家.玩家提现}}
                         <li>
                             <a href="{{.host}}player/cash">玩家提现</a>
                         </li>
+                    {{end}}
                     </ul>
                 </li>
             {{end}}
-            {{if v .user .powers.Agent.Agent_List}}
+            {{if v .user .powers.代理.代理列表}}
                 <li>
                     <a href="#"><i class="fa fa-user-circle"></i> 代理管理<span
                             class="fa arrow"></span></a>
@@ -96,12 +98,12 @@
                         <li>
                             <a href="{{.host}}agent/list">代理列表</a>
                         </li>
-                    {{if v .user .powers.Agent.Agent_Apply_List}}
+                    {{if v .user .powers.代理.代理申请}}
                         <li>
                             <a href="{{.host}}agent/apply">代理申请</a>
                         </li>
                     {{end}}
-                    {{if v .user .powers.Agent.Agent_Cash_List}}
+                    {{if v .user .powers.代理.代理提现}}
                         <li>
                             <a href="{{.host}}agent/cash">佣金提取</a>
                         </li>
@@ -109,12 +111,54 @@
                     </ul>
                 </li>
             {{end}}
-            {{if v .user .powers.Recharge.Recharge}}
+            {{if v .user .powers.充值.后台充值}}
                 <li>
                     <a href="{{.host}}recharge"><i class="fa fa-dollar"></i> 后台充值</a>
                 </li>
             {{end}}
-            {{if v .user .powers.System.SystemCfg}}
+            {{if v .user .powers.数据统计.在线数据}}
+                <li>
+                    <a href="#"><i class="fa fa-dashboard"></i> 数据统计<span
+                            class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="{{.host}}statistic/online">在线数据</a>
+                        </li>
+                    {{if v .user .powers.数据统计.充值数据}}
+                        <li>
+                            <a href="{{.host}}statistic/pay">充值数据</a>
+                        </li>
+                    {{end}}
+                    {{if v .user .powers.数据统计.游戏数据}}
+                        <li>
+                            <a href="{{.host}}statistic/game">游戏数据</a>
+                        </li>
+                    {{end}}
+                    {{if v .user .powers.数据统计.游戏数据}}
+                        <li>
+                            <a href="{{.host}}statistic/player">玩家数据</a>
+                        </li>
+                    {{end}}
+                    </ul>
+                </li>
+            {{end}}
+            {{if v .user .powers.日志.充值日志}}
+                <li>
+                    <a href="#"><i class="fa fa-list"></i> 日志<span
+                            class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="{{.host}}log/recharge">充值日志</a>
+                        </li>
+                    {{if v .user .powers.日志.战绩日志}}
+                        <li>
+                            <a href="{{.host}}log/play">战绩日志</a>
+                        </li>
+                    {{end}}
+                    </ul>
+                </li>
+            {{end}}
+            {{if v .user .powers.系统.系统配置}}
                 <li>
                     <a href="{{.host}}sysconfig"><i class="fa fa-cog"></i> 系统配置</a>
                 </li>

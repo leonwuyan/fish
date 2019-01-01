@@ -106,6 +106,33 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                支付渠道配置
+            </div>
+            <div class="panel-body">
+                <p>渠道说明：1、汇易 2、沃汇宝 3、弘佳</p>
+                <table class="table table-striped table-hover table-bordered">
+                    <tbody>
+                    {{range $key,$value := .payment}}
+                    <tr>
+                        <td style="width: 200px">{{$key}}</td>
+                        <td>
+                            <input type="text" class="form-control" id="payment::{{$key}}" value="{{$value}}"
+                                   placeholder=""
+                                   required>
+                        </td>
+                    </tr>
+                    {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
     $(function () {
         $("input").focus(function () {

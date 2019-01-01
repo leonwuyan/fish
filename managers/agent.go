@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fish/enums"
 	"fish/models"
+	"fish/payment"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"math"
@@ -20,19 +21,38 @@ func newAgent() *AgentMgr {
 	return new(AgentMgr)
 }
 func (this *AgentMgr) GetAgentInfo(agent models.AgentAccount) (result map[string]string) {
-	//o := orm.NewOrm()
+	var today_reg_player, today_reg_player_child, yesterday_reg_player, yesterday_reg_player_child, total_reg_player, total_reg_player_child int64
+	o := orm.NewOrm()
+	today_reg_player, _ = o.QueryTable(new(models.PlayerAccount)).Filter("AgentId", agent.Id).Filter("RsgLogTime__gte", time.Today()).Count()
+	yesterday_reg_player, _ = o.QueryTable(new(models.PlayerAccount)).Filter("AgentId", agent.Id).Filter("RsgLogTime__gte", time.Yesterday()).Filter("RsgLogTime__lt", time.Today()).Count()
+	total_reg_player, _ = o.QueryTable(new(models.PlayerAccount)).Filter("AgentId", agent.Id).Count()
+	children := this.findAllChildrenId(agent.Id)
+	if len(children) > 0 {
+		today_reg_player_child, _ = o.QueryTable(new(models.PlayerAccount)).Filter("AgentId__in", children).Filter("RsgLogTime__gte", time.Today()).Count()
+		yesterday_reg_player_child, _ = o.QueryTable(new(models.PlayerAccount)).Filter("AgentId__in", children).Filter("RsgLogTime__gte", time.Yesterday()).Filter("RsgLogTime__lt", time.Today()).Count()
+		total_reg_player_child, _ = o.QueryTable(new(models.PlayerAccount)).Filter("AgentId__in", children).Count()
+	} else {
+		today_reg_player_child = 0
+		yesterday_reg_player_child = 0
+		total_reg_player_child = 0
+	}
+	var today_tax, yesterday_tax float64
+	o.Raw("SELECT SUM(fee) FROM agent_fee_log WHERE agent_id=? AND log_time>=?", agent.Id, time.Today()).QueryRow(&today_tax)
+	o.Raw("SELECT SUM(fee) FROM agent_fee_log WHERE agent_id=? AND log_time>=? AND log_time<?", agent.Id, time.Yesterday(), time.Today()).QueryRow(&yesterday_tax)
+	//获取是刷新一下
+	agent, _ = this.GetAgentById(agent.Id)
 	result = make(map[string]string)
 	result["rate"] = strconv.Itoa(agent.Rate)
 	result["gold"] = strconv.FormatFloat(agent.Gold/100.0, 'f', 2, 64)
-	result["today_reg_player"] = strconv.Itoa(agent.Rate)
-	result["today_reg_player_child"] = strconv.Itoa(agent.Rate)
-	result["yesterday_reg_player"] = strconv.Itoa(agent.Rate)
-	result["yesterday_reg_player_child"] = strconv.Itoa(agent.Rate)
-	result["total_reg_player"] = strconv.Itoa(agent.TotalPlayersImmediate)
-	result["total_reg_player_child"] = strconv.Itoa(agent.TotalPlayersOther)
-	result["today_tax"] = strconv.FormatFloat(agent.TotalTax/100, 'f', 4, 64)
-	result["yesterday_tax"] = strconv.FormatFloat(agent.TotalTax/100, 'f', 4, 64)
-	result["total_tax"] = strconv.FormatFloat(agent.TotalTax/100, 'f', 4, 64)
+	result["today_reg_player"] = strconv.Itoa(int(today_reg_player))
+	result["today_reg_player_child"] = strconv.Itoa(int(today_reg_player_child))
+	result["yesterday_reg_player"] = strconv.Itoa(int(yesterday_reg_player))
+	result["yesterday_reg_player_child"] = strconv.Itoa(int(yesterday_reg_player_child))
+	result["total_reg_player"] = strconv.Itoa(int(total_reg_player))
+	result["total_reg_player_child"] = strconv.Itoa(int(total_reg_player_child))
+	result["today_tax"] = strconv.FormatFloat(today_tax/100, 'f', 4, 64)
+	result["yesterday_tax"] = strconv.FormatFloat(yesterday_tax/100, 'f', 4, 64)
+	result["total_tax"] = strconv.FormatFloat(agent.TotalFee/100, 'f', 4, 64)
 	result["children"] = strconv.Itoa(agent.TotalChildrenImmediate)
 	result["children_children"] = strconv.Itoa(agent.TotalChildrenOther)
 	return
@@ -165,30 +185,64 @@ func (this *AgentMgr) GetCashLog(agent models.AgentAccount, pageSize, pageIndex 
 	}
 	total, _ = rs.Count()
 	if total > 0 {
-		_, err = rs.Limit(pageSize, (pageIndex-1)*pageSize).All(&feeLogs)
+		_, err = rs.Limit(pageSize, (pageIndex-1)*pageSize).OrderBy("-Id").All(&feeLogs)
 	}
 	return
 }
-func (this *AgentMgr) GetCashInfo(account models.AgentAccount) (info models.AgentCashInfo) {
+func (this *AgentMgr) GetBankInfos(account models.AgentAccount) (infos []models.BankCardInfo, err error) {
 	o := orm.NewOrm()
-	if err := o.QueryTable(info).Filter("Id", account.Id).One(&info); err != nil {
-		return models.AgentCashInfo{AgentId: account.Id}
-	}
+	_, err = o.QueryTable(new(models.BankCardInfo)).Filter("AgentId", account.Id).All(&infos)
 	return
 }
-func (this *AgentMgr) BindCashInfo(account models.AgentAccount, bankInfo models.AgentCashInfo) enums.ReturnCode {
+func (this *AgentMgr) GetBankInfoById(id int) (info models.BankCardInfo) {
 	o := orm.NewOrm()
-	var agentBankInfo models.AgentCashInfo
-	if err := o.QueryTable(agentBankInfo).Filter("Id", account.Id).One(&agentBankInfo); err != nil {
-		if _, err := o.Insert(&bankInfo); err != nil {
-			return enums.DB_ACTION_ERROR
-		}
+	o.QueryTable(info).Filter("Id", id).One(&info)
+	return
+}
+func (this *AgentMgr) AddBankInfo(info models.BankCardInfo) enums.ReturnCode {
+	o := orm.NewOrm()
+	if _, err := o.Insert(&info); err != nil {
+		return enums.DB_ACTION_ERROR
+	}
+	return enums.SUCCESS
+}
+func (this *AgentMgr) UpdateBankInfo(info models.BankCardInfo) enums.ReturnCode {
+	o := orm.NewOrm()
+	if _, err := o.Update(&info); err != nil {
+		return enums.DB_ACTION_ERROR
+	}
+	return enums.SUCCESS
+}
+func (this *AgentMgr) CashApply(account models.AgentAccount, amount, bankInfoId int) enums.ReturnCode {
+	changeGold := amount * 100
+	bankInfo := this.GetBankInfoById(bankInfoId)
+	o := orm.NewOrm()
+	o.Begin()
+	o.QueryTable(account).Filter("Id", account.Id).Update(orm.Params{"Gold": orm.ColValue(orm.ColAdd, -changeGold)})
+	o.QueryTable(account).Filter("Id", account.Id).One(&account)
+	if account.Gold < 0 {
+		o.Rollback()
+		return enums.AGENT_NOT_ENOUGH_GOLD
+	}
+	cashLog := models.AgentCashLog{}
+	cashLog.AgentId = account.Id
+	cashLog.Gold = changeGold
+	cashLog.TxType = bankInfo.CashType
+	cashLog.OrderId = payment.Create_order()
+	if enums.CashType(bankInfo.CashType) == enums.CASH_TYPE_ALIPAY {
+		cashLog.Alipay = bankInfo.BankCardNo
+		cashLog.AlipayName = bankInfo.RealName
 	} else {
-		agentBankInfo = bankInfo
-		if _, err := o.Update(agentBankInfo); err != nil {
-			return enums.DB_ACTION_ERROR
-		}
+		cashLog.BankCardTypeId = bankInfo.BankType
+		cashLog.BankCardNo = bankInfo.BankCardNo
+		cashLog.RealName = bankInfo.RealName
 	}
+	cashLog.WithdrawalsLogTime = time.Now()
+	if _, err := o.Insert(&cashLog); err != nil {
+		o.Rollback()
+		return enums.DB_ACTION_ERROR
+	}
+	o.Commit()
 	return enums.SUCCESS
 }
 
@@ -201,38 +255,42 @@ func (this *AgentMgr) ChangeChildRate(account models.AgentAccount, id, rate int)
 }
 
 func (this *AgentMgr) FeeToAgent(playLog models.PlayLog) (err error) {
-	var feeRate = 0.0
+	var feeRate = 0
 	switch enums.GameType(playLog.GameId) {
 	default:
 	case enums.GAME_CATCH_FISH:
-		feeRate = 0.0
+		feeRate = 3
 		break
 	case enums.GAME_GOLDEN_FLOWER, enums.GAME_DOUDIZHU, enums.GAME_NIUNIU_M, enums.GAME_KING_QUEE, enums.GAME_NIUNIU_Z, enums.GAME_DRAGON_TIGER:
-		feeRate = 0.05
+		feeRate = 5
 		break
 	}
 	if feeRate > 0 {
 		agentId := this.GetPlayerAgent(playLog.UserId)
 		if agentId > 0 {
 			if agent, err := this.GetAgentById(agentId); err == nil {
-				this.statistic_fee(playLog, "", agent, models.AgentAccount{}, feeRate)
+				this.statistic_fee(playLog, "", agent, models.AgentAccount{}, int64(feeRate))
 			}
 		}
 	}
 	return nil
 }
-func (this *AgentMgr) statistic_fee(playLog models.PlayLog, playerName string, agent, child models.AgentAccount, gameFeeRate float64) {
-	//tax := float64(playLog.GoldChange) / 2.0
-	var realGoldChange int64
+func (this *AgentMgr) statistic_fee(playLog models.PlayLog, playerName string, agent, child models.AgentAccount, gameFeeRate int64) {
+	var realGoldChange int64 //玩家真实输赢
 	if playLog.GoldChange > 0 {
-		realGoldChange = playLog.GoldChange * 100 / 95
+		realGoldChange = playLog.GoldChange * 100 / (100 - gameFeeRate)
 	} else {
 		realGoldChange = playLog.GoldChange
 	}
-	tax := float64(realGoldChange) * gameFeeRate
-	agentFeeRate := agent.Rate - child.Rate
-	winLose := float64(realGoldChange) * float64(agentFeeRate) / 100
+	//总税收
+	tax := float64(realGoldChange) * float64(gameFeeRate) / 100 / 2 //输赢各一半
+	//真实税收
 	realTax := math.Abs(tax)
+	//代理应得比例
+	agentFeeRate := agent.Rate - child.Rate
+	//玩家输赢按代理权重计算
+	winLose := float64(realGoldChange) * float64(agentFeeRate) / 100
+	//代理收益
 	fee := realTax * float64(agentFeeRate) / 100
 	logData := models.AgentFeeLog{
 		LogId:      playLog.Id,
@@ -247,7 +305,7 @@ func (this *AgentMgr) statistic_fee(playLog models.PlayLog, playerName string, a
 		ChildRate:  child.Rate,
 		Fee:        fee,
 		WinLose:    winLose,
-		LogTime:    time.Now(),
+		LogTime:    playLog.CreateTime,
 	}
 	o := orm.NewOrm()
 	o.Begin()
@@ -285,6 +343,20 @@ func (this *AgentMgr) statistic_fee(playLog models.PlayLog, playerName string, a
 		this.statistic_fee(playLog, playerName, parent, agent, gameFeeRate)
 	}
 }
+func (this *AgentMgr) Statistic_player(agentId int, isImmediate bool) (err error) {
+	o := orm.NewOrm()
+	if agent, err := this.GetAgentById(agentId); err == nil {
+		if isImmediate {
+			o.QueryTable(agent).Filter("Id", agent.Id).Update(orm.Params{"TotalPlayersImmediate": orm.ColValue(orm.ColAdd, 1)})
+		} else {
+			o.QueryTable(agent).Filter("Id", agent.Id).Update(orm.Params{"TotalPlayersOther": orm.ColValue(orm.ColAdd, 1)})
+		}
+		if agent.ParentId > 0 {
+			this.Statistic_player(agent.ParentId, false)
+		}
+	}
+	return
+}
 func (this *AgentMgr) statistic_child(account models.AgentAccount, isImmediate bool) {
 	if account.ParentId > 0 {
 		var parent models.AgentAccount
@@ -298,4 +370,24 @@ func (this *AgentMgr) statistic_child(account models.AgentAccount, isImmediate b
 			this.statistic_child(parent, false)
 		}
 	}
+}
+
+func (this *AgentMgr) findAllChildrenId(id int) (ids []int) {
+	children := this.findChildrenId(id)
+	if len(children) > 0 {
+		ids = append(ids, children...)
+		for _, id := range ids {
+			ids = append(ids, this.findAllChildrenId(id)...)
+		}
+	}
+	return
+}
+func (this *AgentMgr) findChildrenId(id int) (ids []int) {
+	o := orm.NewOrm()
+	var children []models.AgentAccount
+	o.QueryTable(new(models.AgentAccount)).Filter("ParentId", id).All(&children)
+	for _, child := range children {
+		ids = append(ids, child.Id)
+	}
+	return ids
 }

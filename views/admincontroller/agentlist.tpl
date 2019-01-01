@@ -63,10 +63,10 @@
         {title: '电话', field: 'mobile'},
         {title: '旗下代理数', field: 'total_children_immediate'},
         {title: '旗下玩家数', field: 'total_players_immediate'},
-        {title: '玩家总收入', field: 'total_tax', formatter: goldFormatter},
+        {title: '玩家总收入', field: 'total_tax',formatter:fishApp.formatter.gold},
         {title: '提成比例', field: 'rate'},
-        {title: '余额', field: 'gold', formatter: goldFormatter},
-        {title: '总收入', field: 'total_tax', formatter: goldFormatter},
+        {title: '余额', field: 'gold',formatter:fishApp.formatter.gold},
+        {title: '总收入', field: 'total_fee',formatter:fishApp.formatter.gold},
         {title: '注册时间', field: 'register_time'},
         {
             title: '操作', formatter: function (value, row) {
@@ -74,13 +74,6 @@
             }
         }
     ];
-
-    function goldFormatter(value) {
-        return (value / 100).toFixed(2)
-    }
     dataurl = location.href;
-</script>
-<script src="/static/js/fish.js?{{.rand}}"></script>
-<script>
     fishApp.dataPage();
 </script>

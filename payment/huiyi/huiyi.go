@@ -13,7 +13,7 @@ var merId = "1067"
 var userId = "1067"
 var secretKey = "8d1e408ee8575afd28349b5ae3cdea0a"
 var currency = "CNY"
-var http_pay = "https://gateway.66nou.com/v2/payment/trade"
+var http_pay = "http://gateway.66nou.com/v2/payment/trade"
 
 //var http_query = "https://gateway.66nou.com/v2/payment/query"
 var successCode = "000000"
@@ -71,7 +71,6 @@ func makeSign(params map[string]string, secretKey string) string {
 		}
 	}
 	sign_str = sign_str + "key=" + secretKey
-	println(sign_str)
 	return create_md5(sign_str)
 }
 func create_md5(sign string) (s string) {

@@ -1,11 +1,19 @@
 package controllers
 
 import (
+	"bytes"
 	"fish/configs"
 	"fish/enums"
 	"fish/managers"
 	"fish/models"
+	"fmt"
 	"github.com/astaxie/beego/logs"
+	"github.com/nfnt/resize"
+	"github.com/skip2/go-qrcode"
+	"image"
+	"image/draw"
+	"image/png"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -92,7 +100,18 @@ func (c *AgentController) ChangePwd() {
 	}
 }
 func (c *AgentController) Generalize() {
-	c.Data["ad_url"] = configs.Domain["domain"] + "advertise?agentId=" + strconv.Itoa(c.agent.Id)
+	adUrl := configs.Domain["domain"] + "advertise?agentId=" + strconv.Itoa(c.agent.Id)
+	c.Data["ad_url"] = adUrl
+}
+func (c *AgentController) GeneralizeQr() {
+	templateId := c.Ctx.Input.Param(":id")
+	adUrl := configs.Domain["domain"] + "advertise?agentId=" + strconv.Itoa(c.agent.Id)
+	img, _ := c.createQr(fmt.Sprintf("static/img/bg%s.png", templateId), adUrl)
+	c.Ctx.Output.ContentType("png")
+	encoder := png.Encoder{CompressionLevel: png.BestCompression}
+	var b bytes.Buffer
+	encoder.Encode(&b, img)
+	c.Ctx.Output.Body(b.Bytes())
 }
 func (c *AgentController) Agents() {
 	if c.Ctx.Input.IsPost() {
@@ -117,7 +136,7 @@ func (c *AgentController) Agents() {
 			mobile := c.GetString("mobile")
 			nickname := c.GetString("nickname")
 			rate, _ := c.GetInt("rate")
-			if rate <= c.agent.Rate {
+			if rate > 0 && rate <= c.agent.Rate {
 				newAgent := models.AgentAccount{
 					Name:         agent_name,
 					Password:     default_pass,
@@ -132,15 +151,15 @@ func (c *AgentController) Agents() {
 				c.Data["json"] = c.jsonData(enums.INVALID_ACTION)
 			}
 			break
-		case "change_rate":
-			agent_id, _ := c.GetInt("agent_id")
-			rate, _ := c.GetInt("rate")
-			if rate <= c.agent.Rate {
-				c.Data["json"] = c.jsonData(managers.AgentInstance.ChangeChildRate(c.agent, agent_id, rate))
-			} else {
-				c.Data["json"] = c.jsonData(enums.INVALID_ACTION)
-			}
-			break
+			//case "change_rate":
+			//	agent_id, _ := c.GetInt("agent_id")
+			//	rate, _ := c.GetInt("rate")
+			//	if rate <= c.agent.Rate {
+			//		c.Data["json"] = c.jsonData(managers.AgentInstance.ChangeChildRate(c.agent, agent_id, rate))
+			//	} else {
+			//		c.Data["json"] = c.jsonData(enums.INVALID_ACTION)
+			//	}
+			//	break
 		default:
 			c.Data["json"] = c.jsonData(enums.INVALID_ACTION)
 			break
@@ -210,35 +229,44 @@ func (c *AgentController) Cash() {
 		c.ServeJSON()
 	}
 }
-func (c *AgentController) BindCashInfo() {
+func (c *AgentController) CashApply() {
 	if c.Ctx.Input.IsPost() {
-		bindType, _ := c.GetInt("bindType")
-		var agentBankInfo models.AgentCashInfo
-		switch enums.CashType(bindType) {
-		case enums.CASH_TYPE_ALIPAY:
-			alipay := c.GetString("alipay")
+		infos, _ := managers.AgentInstance.GetBankInfos(c.agent)
+		c.Data["json"] = c.jsonData(enums.SUCCESS, infos, len(infos))
+		c.ServeJSON()
+	}
+	if c.Ctx.Input.IsPut() {
+		action := c.GetString("action")
+		switch action {
+		case "save":
+			cashType, _ := c.GetInt("cash_type")
+			bankCode, _ := c.GetInt("bank_code")
+			bankName := c.GetString("bank_name")
+			bankCard := c.GetString("bank_card")
 			realName := c.GetString("real_name")
-			agentBankInfo = models.AgentCashInfo{
-				AgentId:        c.agent.Id,
-				Alipay:         alipay,
-				AlipayRealName: realName,
+			data := models.BankCardInfo{
+				AgentId:    c.agent.Id,
+				CashType:   cashType,
+				BankType:   bankCode,
+				BankName:   bankName,
+				BankCardNo: bankCard,
+				RealName:   realName,
+			}
+			c.Data["json"] = c.jsonData(managers.AgentInstance.AddBankInfo(data))
+			break
+		case "apply":
+			amount, _ := c.GetInt("amount")
+			bankInfoId, _ := c.GetInt("bank_info_id")
+			if amount/100 < 1 || amount%100 > 0 {
+				c.Data["json"] = c.jsonData(enums.AMOUNT_MUST_100)
+			} else {
+				c.Data["json"] = c.jsonData(managers.AgentInstance.CashApply(c.agent, amount, bankInfoId))
 			}
 			break
-		case enums.CASH_TYPE_BANKCARD:
-			bankType, _ := c.GetInt("bank_type")
-			BankInfo := c.GetString("bank_info")
-			bankCardNo := c.GetString("bank_card_no")
-			realName := c.GetString("real_name")
-			agentBankInfo = models.AgentCashInfo{
-				AgentId:      c.agent.Id,
-				BankType:     bankType,
-				BankInfo:     BankInfo,
-				BankCardNo:   bankCardNo,
-				BankRealName: realName,
-			}
+		default:
+			c.Data["json"] = c.jsonData(enums.INVALID_ACTION)
 			break
 		}
-		c.Data["json"] = managers.AgentInstance.BindCashInfo(c.agent, agentBankInfo)
 		c.ServeJSON()
 	}
 }
@@ -263,4 +291,32 @@ func (c *AgentController) checkSession() bool {
 		}
 	}
 	return false
+}
+
+func (c *AgentController) createQr(bgPath, info string) (newImg draw.Image, err error) {
+	bgFile, err := os.Open(bgPath)
+	defer bgFile.Close()
+	if err != nil {
+		return
+	}
+	logoFile, err := os.Open("static/img/logo.png")
+	defer logoFile.Close()
+	if err != nil {
+		return
+	}
+	bgImg, _ := png.Decode(bgFile)
+	logoImg, _ := png.Decode(logoFile)
+
+	qrCode, _ := qrcode.New(info, qrcode.Highest)
+	qrImg := qrCode.Image(232)
+	logoImgSize := qrImg.Bounds().Max.X / 4
+	logoImg = resize.Thumbnail(uint(logoImgSize), uint(logoImgSize), logoImg, resize.Lanczos3)
+	newImg = image.NewRGBA64(bgImg.Bounds())
+	global_offset_Y := 657
+	qrImg_offset := image.Pt(bgImg.Bounds().Max.X/2-qrImg.Bounds().Max.X/2, global_offset_Y-qrImg.Bounds().Max.Y/2)
+	logoImg_offset := qrImg_offset.Add(image.Pt(qrImg.Bounds().Max.X/2-logoImg.Bounds().Max.X/2, qrImg.Bounds().Max.Y/2-logoImg.Bounds().Max.Y/2))
+	draw.Draw(newImg, bgImg.Bounds(), bgImg, bgImg.Bounds().Min, draw.Over)
+	draw.Draw(newImg, qrImg.Bounds().Add(qrImg_offset), qrImg, qrImg.Bounds().Min, draw.Src)
+	draw.Draw(newImg, qrImg.Bounds().Add(logoImg_offset), logoImg, logoImg.Bounds().Min, draw.Src)
+	return
 }

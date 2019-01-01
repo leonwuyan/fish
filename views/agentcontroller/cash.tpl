@@ -34,12 +34,9 @@
                         </div>
                         <button class="btn btn-info form-control" type="submit"><span
                                 class="fa fa-search"></span></button>
-                        <button id="btn-add" type="button" class="btn-danger form-control"
-                                data-toggle="modal"
-                                data-target="#data-modal"
-                                data-remote="{{.domain}}forms/?a=add_agent"><span
+                        <a id="btn-add" type="button" href="{{.host}}cash/apply" class="btn-danger form-control"><span
                                 class="fa fa-plus"></span>发起新提现
-                        </button>
+                        </a>
                     </form>
                 </div>
                 <table class="table table-striped table-bordered table-hover" id="dataTable">
@@ -60,24 +57,12 @@
         {title: '代理ID', field: 'agent_id'},
         {title: '订单号', field: 'order_id'},
         {title: '姓名', field: 'real_name'},
-        {title: '支付方式', field: 'cash_type', formatter: fishApp.formatter.cashType},
-        {title: '支付信息', formatter: formatCashInfo},
+        {title: '金额', field: 'gold',formatter: fishApp.formatter.gold},
+        {title: '支付方式', field: 'tx_type', formatter: fishApp.formatter.cashType},
+        {title: '支付信息', formatter: fishApp.formatter.cashInfo},
         {title: '时间', field: 'withdrawals_log_time'},
         {title: '状态', field: 'state', formatter: fishApp.formatter.cashState},
     ];
-
-    function formatCashInfo(value, row) {
-        switch (row.tx_type) {
-            case 1:
-                return "账号：" + row.alipay;
-            case 2:
-                return "银行：" + fishApp.formatter.bankType(row.bank_type)  + " 卡号：" + row.bank_card_no
-        }
-    }
-
     dataurl = location.href;
-    showFooter = false;
-</script>
-<script>
     fishApp.dataPage();
 </script>

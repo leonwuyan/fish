@@ -54,10 +54,5 @@
     ];
     dataurl =location.href;
     showFooter = false;
-</script>
-
-<script src="/static/js/fish.js?{{.rand}}"></script>
-<script>
-
     fishApp.dataPage();
 </script>

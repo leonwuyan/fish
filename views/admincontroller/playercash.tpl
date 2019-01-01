@@ -50,13 +50,13 @@
     datacolumns = [
         {title: '玩家ID', field: 'user_id'},
         {title: '昵称', field: 'username'},
-        {title: '提取金额', field: 'gold'},
-        {title: '获得金额', field: 'get_money'},
-        {title: '手续费', field: 'fee'},
-        {title: '提现类型', field: 'tx_type', formatter: formatCashType},
-        {title: '提现信息', formatter: formatCashInfo},
+        {title: '提取金额', field: 'gold', formatter: fishApp.formatter.gold},
+        {title: '获得金额', field: 'get_money', formatter: fishApp.formatter.gold},
+        {title: '手续费', field: 'fee', formatter: fishApp.formatter.gold},
+        {title: '提现类型', field: 'tx_type', formatter: fishApp.formatter.cashType},
+        {title: '提现信息', formatter: fishApp.formatter.cashInfo},
         {title: '提现时间', field: 'withdrawals_log_time'},
-        {title: '状态', field: 'state', formatter: formatState},
+        {title: '状态', field: 'state', formatter: fishApp.formatter.cashState},
         {
             title: '操作', formatter: function (value, row) {
                 if (row.state < 2) {
@@ -66,45 +66,7 @@
             }
         }
     ];
-
-    function formatState(value) {
-        switch (value) {
-            case 0:
-                return "<b class='text-info'>申请中</b>";
-            case 1:
-                return "<b class='text-primary'>等待付款</b>";
-            case 2:
-                return "<b class='text-warning'>拒绝兑换</b>";
-            case 3:
-                return "<b class='text-success'>成功兑换</b>";
-            case 4:
-                return "<b class='text-danger'>退款</b>";
-        }
-    }
-
-    function formatCashType(value) {
-        switch (value) {
-            case 0:
-                return "支付宝";
-            case 1:
-                return "银行卡";
-            case 2:
-                return "代理商";
-        }
-    }
-
-    function formatCashInfo(value, row) {
-        switch (row.tx_type) {
-            case 0:
-                return "支付宝账号：" + row.alipay + "<br>支付宝姓名：" + row.alipay_name;
-            case 1:
-                return "银行：" + row.bank_card_type_id + "卡号：" + row.bank_card_no + "<br>真实姓名：" + row.real_name;
-        }
-    }
-
     dataurl = location.href;
     showFooter = false;
-</script>
-<script>
     fishApp.dataPage();
 </script>

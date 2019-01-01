@@ -39,16 +39,12 @@
         {title: '玩家ID', field: 'user_id'},
         {title: '昵称', field: 'nick_name'},
         {title: '所属代理', field: 'agent_id'},
-        {title: '身上余额', field: 'global_num'},
-        {title: '保险箱余额', field: 'bank_num'},
-        {title: '累计税收', field: 'tax'},
-        {title: '充值金额', field: 'total_recharge_sum'},
-        {title: '提现金额', field: 'all_withdraw_amount'},
+        {title: '身上余额', field: 'global_num', formatter: fishApp.formatter.gold},
+        {title: '保险箱余额', field: 'bank_num', formatter: fishApp.formatter.gold},
+        {title: '累计税收', field: 'tax', formatter: fishApp.formatter.gold},
+        {title: '充值金额', field: 'total_recharge_sum', formatter: fishApp.formatter.gold},
+        {title: '提现金额', field: 'all_withdraw_amount', formatter: fishApp.formatter.gold},
     ];
     dataurl =location.href;
-    showFooter = false;
-</script>
-<script src="/static/js/fish.js?{{.rand}}"></script>
-<script>
     fishApp.dataPage();
 </script>
