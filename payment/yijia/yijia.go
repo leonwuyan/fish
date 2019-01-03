@@ -11,7 +11,7 @@ import (
 
 const (
 	CustomerId = "190204646"
-	SecretKey  = "ece4a7bbb0c54c2e9e7a6a3be0afd999"
+	SecretKey  = "nb0v12vs5f2yt7ctljclaphrt44g4y9i"
 	API_URL    = "http://www.yjiapay.com/Pay_Index.html"
 )
 
@@ -23,7 +23,7 @@ const (
 	//PAY_TYPE_BANK   PayType = 1005
 )
 
-func createParams(amount int, payType PayType, order, notify string) (params map[string]string) {
+func createParams(amount float64, payType PayType, order, notify string) (params map[string]string) {
 	params = make(map[string]string)
 	params["pay_memberid"] = CustomerId
 	params["pay_orderid"] = order
@@ -31,7 +31,7 @@ func createParams(amount int, payType PayType, order, notify string) (params map
 	params["pay_bankcode"] = strconv.Itoa(int(payType))
 	params["pay_notifyurl"] = notify
 	params["pay_callbackurl"] = notify
-	params["pay_amount"] = strconv.Itoa(amount)
+	params["pay_amount"] = strconv.FormatFloat(amount, 'f', 2, 64)
 	params["pay_md5sign"] = makeSign(params)
 	params["pay_productname"] = "金币"
 	return params
@@ -58,7 +58,7 @@ func create_md5(sign string) (s string) {
 	s = fmt.Sprintf("%x", has)
 	return strings.ToLower(s)
 }
-func PostPay(amount int, payType PayType, order, notify string) (form string) {
+func PostPay(amount float64, payType PayType, order, notify string) (form string) {
 	params := createParams(amount, payType, order, notify)
 	form = "<form action='" + API_URL + "' method='post' id='form_pay'>"
 	for key, value := range params {

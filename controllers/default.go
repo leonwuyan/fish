@@ -172,7 +172,7 @@ func (c *MainController) RechargeYiJia(userId, channel, pay_type int, amount flo
 		c.Abort("10002")
 		break
 	case 105:
-		c.Data["html"] = yijia.PostPay(int(amount*100), yiJiaType(pay_type), pay_order, configs.Domain["domain"]+"notify/yi_jia")
+		c.Data["html"] = yijia.PostPay(amount, yiJiaType(pay_type), pay_order, configs.Domain["domain"]+"notify/yi_jia")
 		break
 	}
 }
