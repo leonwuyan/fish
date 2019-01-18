@@ -114,7 +114,7 @@
                 支付渠道配置
             </div>
             <div class="panel-body">
-                <p>渠道说明：1、汇易 2、沃汇宝 3、弘佳</p>
+                <p>渠道说明：1、汇易 2、沃汇宝 3、弘佳 4、纵横 5、易佳</p>
                 <table class="table table-striped table-hover table-bordered">
                     <tbody>
                     {{range $key,$value := .payment}}

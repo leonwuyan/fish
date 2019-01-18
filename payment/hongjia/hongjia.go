@@ -15,7 +15,7 @@ const (
 type PayType string
 
 const (
-	PAY_TYPE_ALIPAY PayType = "alipay"
+	PAY_TYPE_ALIPAY PayType = "alipaywap"
 	PAY_TYPE_WECHAT PayType = "weixin"
 	PAY_TYPE_BANK   PayType = "quickbank"
 )

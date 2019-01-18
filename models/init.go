@@ -13,8 +13,8 @@ func RegisterDB() {
 	orm.RegisterModel(
 		new(AdminAccount),
 		new(AgentAccount),
+		new(AgentApply),
 		new(AgentFeeLog),
-		new(PlayLog),
 		new(SmsLog),
 		new(AgentCashLog),
 		new(PlayerCashLog),
@@ -22,6 +22,16 @@ func RegisterDB() {
 		new(RechargeLog),
 		new(PlayerAccount),
 		new(BankCardInfo),
+		new(PlayLog),
+		new(LoginLog),
+		new(GoldChangeLog),
+		new(PumpLogDetail),
+		new(LogPageVisit),
+		new(ChatMessages),
+		//
+		new(Channel),
+		new(AgentShow),
+		new(Notice),
 	)
 	orm.RunSyncdb("default", false, true)
 	orm.Debug = beego.BConfig.RunMode == "dev"

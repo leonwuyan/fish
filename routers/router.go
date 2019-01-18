@@ -21,13 +21,13 @@ func init() {
 	beego.Router("/notify/hong_jia", &controllers.MainController{}, "*:Notify_Hong_Jia")
 	beego.Router("/notify/zong_heng", &controllers.MainController{}, "*:Notify_Zong_Heng")
 	beego.Router("/notify/yi_jia", &controllers.MainController{}, "*:Notify_Yi_Jia")
-
 	ns_admin := beego.NewNamespace("/admin",
 		beego.NSRouter("/", &controllers.AdminController{}, "*:Index"),
 		beego.NSRouter("/login", &controllers.AdminController{}, "*:Login"),
 		beego.NSRouter("/logout", &controllers.AdminController{}, "*:Logout"),
 		beego.NSRouter("/changepwd", &controllers.AdminController{}, "*:ChangePwd"),
-		beego.NSRouter("/sysconfig", &controllers.AdminController{}, "*:SystemConfig"),
+		beego.NSRouter("/sys/config", &controllers.AdminController{}, "*:SystemConfig"),
+		beego.NSRouter("/sys/channel", &controllers.AdminController{}, "*:ChannelInfo"),
 
 		beego.NSRouter("/admin/list", &controllers.AdminController{}, "*:AdminList"),
 
@@ -40,10 +40,16 @@ func init() {
 
 		beego.NSRouter("/recharge", &controllers.AdminController{}, "*:Recharge"),
 
+		beego.NSRouter("/services/message", &controllers.AdminController{}, "*:ChatMessages"),
+
 		beego.NSRouter("/statistic/online", &controllers.AdminController{}, "*:Online"),
+		beego.NSRouter("/statistic/game", &controllers.AdminController{}, "*:StatisticsPlay"),
 
 		beego.NSRouter("/log/recharge", &controllers.AdminController{}, "*:LogRecharge"),
 		beego.NSRouter("/log/play", &controllers.AdminController{}, "*:LogPlay"),
+
+		beego.NSRouter("/balance", &controllers.AdminController{}, "*:Balance"),
+		beego.NSRouter("/ws", &controllers.AdminController{}, "*:SysMessage"),
 	)
 	ns_agent := beego.NewNamespace("/agent",
 		beego.NSRouter("/", &controllers.AgentController{}, "*:Index"),
@@ -59,5 +65,8 @@ func init() {
 		beego.NSRouter("/cash/apply", &controllers.AgentController{}, "*:CashApply"),
 		beego.NSRouter("/changepwd", &controllers.AgentController{}, "*:ChangePwd"),
 	)
-	beego.AddNamespace(ns_admin, ns_agent)
+	ns_api := beego.NewNamespace("/api",
+		beego.NSRouter("/", &controllers.ApiController{}),
+	)
+	beego.AddNamespace(ns_admin, ns_agent, ns_api)
 }

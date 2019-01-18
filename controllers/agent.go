@@ -12,7 +12,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"image"
 	"image/draw"
-	"image/png"
+	"image/jpeg"
 	"os"
 	"reflect"
 	"strconv"
@@ -45,6 +45,7 @@ func (c *AgentController) Prepare() {
 			c.Data["user"] = c.agent
 		}
 	}
+	managers.SystemInstance.PageVisitor(c.Ctx.Input, c.GetSession("agent"))
 }
 func (c *AgentController) Index() {
 	if c.Ctx.Input.IsPost() {
@@ -108,9 +109,8 @@ func (c *AgentController) GeneralizeQr() {
 	adUrl := configs.Domain["domain"] + "advertise?agentId=" + strconv.Itoa(c.agent.Id)
 	img, _ := c.createQr(fmt.Sprintf("static/img/bg%s.png", templateId), adUrl)
 	c.Ctx.Output.ContentType("png")
-	encoder := png.Encoder{CompressionLevel: png.BestCompression}
 	var b bytes.Buffer
-	encoder.Encode(&b, img)
+	jpeg.Encode(&b, img, &jpeg.Options{Quality: 75})
 	c.Ctx.Output.Body(b.Bytes())
 }
 func (c *AgentController) Agents() {
@@ -136,7 +136,7 @@ func (c *AgentController) Agents() {
 			mobile := c.GetString("mobile")
 			nickname := c.GetString("nickname")
 			rate, _ := c.GetInt("rate")
-			if rate > 0 && rate <= c.agent.Rate {
+			if rate <= c.agent.Rate {
 				newAgent := models.AgentAccount{
 					Name:         agent_name,
 					Password:     default_pass,
@@ -304,8 +304,8 @@ func (c *AgentController) createQr(bgPath, info string) (newImg draw.Image, err 
 	if err != nil {
 		return
 	}
-	bgImg, _ := png.Decode(bgFile)
-	logoImg, _ := png.Decode(logoFile)
+	bgImg, _ := jpeg.Decode(bgFile)
+	logoImg, _ := jpeg.Decode(logoFile)
 
 	qrCode, _ := qrcode.New(info, qrcode.Highest)
 	qrImg := qrCode.Image(232)

@@ -1,9 +1,9 @@
 <div class="row">
     <div class="col-md-12">
         <ol class="breadcrumb">
-            <li><a href="{{.host}}"> "menu.home"}}</a></li>
-            <li><a href="#"> "menu.info"}}</a></li>
-            <li> "menu.players"}}</li>
+            <li><a href="{{.host}}"> 概况</a></li>
+            <li><a href="#"> 代理管理</a></li>
+            <li> 代理申请</li>
         </ol>
     </div>
 </div>
@@ -16,14 +16,14 @@
                 <span class="fa fa-long-arrow-up"></span>
             </button>
             <div class="panel-heading">
-                "menu.players"}}
+                代理申请
             </div>
             <div class="panel-body">
                 <div id="toolbar" class="data-collapse">
                     <form id="search-form" class="form-inline" role="form">
                         <div class="form-group input-group">
                             <input id="id" name="id" class="form-control" type="text"
-                                   placeholder=" tips.accountid">
+                                   placeholder="请输入玩家ID">
                         </div>
                         <button class="btn btn-info form-control" type="submit"><span
                                 class="fa fa-search"></span></button>
@@ -37,20 +37,17 @@
 </div>
 <script>
     datacolumns = [
-        {title: 'ID', field: 'UserId'},
-        {title: '11', field: 'nickname'},
-        {title: '22', field: 'diamonds'},
-        {title: '22', field: 'room_cards'},
-        {title: '22', field: 'room_cards'},
-        {title: '33', field: 'bind_time'},
-        {title: '44', field: 'last_login_time'},
-        {
-            title: ' "data.action"}}', formatter: function (value, row) {
-                if (row.groupId !== 1) {
-                    return '<a class="btn btn-info" href="{{.host}}add?id=' + row.id + '"> "content.set_to_agent"}}</a> '
-                }
-            }
-        }
+        {title: '玩家ID', field: 'user_id'},
+        {title: '申请时间', field: 'apply_time'},
+        {title: '姓名', field: 'name'},
+        {title: '电话', field: 'phone'},
+        {title: '邮箱', field: 'email'},
+        {title: 'QQ', field: 'qq'},
+        {title: '微信', field: 'wei_xin'},
+        {title: '消息内容', field: 'message'},
+        {title: '是否处理', field: 'is_deal'},
+        {title: '处理时间', field: 'deal_time'},
+        {title: '回复内容', field: 'reply'},
     ];
     dataurl =location.href;
     showFooter = false;

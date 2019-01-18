@@ -11,7 +11,7 @@ const (
 	CHANGE_CONFIG_FAILED    ReturnCode = 10005 //修改配置失败
 	INVALID_ACTION          ReturnCode = 10006 //无效的操作
 	NOT_ENOUGH_PERMISSION   ReturnCode = 10007 //没有权限
-	AGENT_NOT_LOGIN         ReturnCode = 20000 //没有登录
+	AGENT_NOT_LOGIN         ReturnCode = 20000 //代理没有登录
 	AGENT_NOT_FOUND         ReturnCode = 20001 //代理账号不存在
 	AGENT_UNUSED            ReturnCode = 20002 //不可用
 	AGENT_PASSWORD_ERROR    ReturnCode = 20003 //密码错误
@@ -20,6 +20,7 @@ const (
 	AGENT_NOT_ENOUGH_GOLD   ReturnCode = 20006 //新密码不一致
 	PLAYER_NOT_FOUND        ReturnCode = 30001 //玩家账号不存在
 	AMOUNT_MUST_100         ReturnCode = 30002
+	ADMIN_NOT_LOGIN         ReturnCode = 40000 //管理没有登录
 )
 
 func (this ReturnCode) String() string {
@@ -122,4 +123,24 @@ const (
 	PAY_CHANNEL_HONGJIA  PaymentChannel = 3
 	PAY_CHANNEL_ZONGHENG PaymentChannel = 4
 	PAY_CHANNEL_YIJIA    PaymentChannel = 5
+	PAY_CHANNEL_ALIPAY   PaymentChannel = 6
+)
+
+type GoldChangeType int
+
+const (
+	GOLD_CHANGE_GAME_CATCH_FISH    GoldChangeType = 1  //2.捕鱼游戏输赢
+	GOLD_CHANGE_GAME_GOLDEN_FLOWER GoldChangeType = 2  // 2.金花游戏输赢
+	GOLD_CHANGE_GAME_DOUDIZU       GoldChangeType = 3  // 3.斗地主输赢
+	GOLD_CHANGE_GAME_NIUNIU_M      GoldChangeType = 4  // 4.百人牛牛输赢
+	GOLD_CHANGE_GAME_KING_QUEE     GoldChangeType = 5  // 5.红黑大战输赢
+	GOLD_CHANGE_RECHARGE           GoldChangeType = 6  // 6.充值
+	GOLD_CHANGE_CASH               GoldChangeType = 7  // 7.提现
+	GOLD_CHANGE_BANK               GoldChangeType = 8  // 8.银行操作
+	GOLD_CHANGE_AWARD              GoldChangeType = 9  // 9.补偿
+	GOLD_CHANGE_RETURN             GoldChangeType = 10 // 10.还款
+	GOLD_CHANGE_GAME_NIUNIU_Z      GoldChangeType = 11 // 11.抢庄牛牛
+	GOLD_CHANGE_GAME_DRAGON_TIGER  GoldChangeType = 12 // 12.龙虎斗
+	GOLD_CHANGE_CASH_FAIL          GoldChangeType = 13 // 13.提现失败返还的金币
+	GOLD_CHANGE_RED_PACKET         GoldChangeType = 14 // 14.领取红包',
 )

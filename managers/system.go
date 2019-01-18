@@ -4,7 +4,9 @@ import (
 	"fish/alisms"
 	"fish/configs"
 	"fish/models"
+	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/orm"
 	"time"
 )
@@ -12,7 +14,7 @@ import (
 type SystemMgr struct {
 }
 
-var SystemInstanse = newSystem()
+var SystemInstance = newSystem()
 
 func newSystem() *SystemMgr {
 	return new(SystemMgr)
@@ -22,6 +24,10 @@ func (this *SystemMgr) Recharge() {
 }
 func (this *SystemMgr) PreRecharge(userId, channel, payType, amount int, payOrder string) (err error) {
 	o := orm.NewOrm()
+	player, err := PlayerInstance.GetPlayerById(userId)
+	if err != nil {
+		return
+	}
 	rechargeData := models.RechargeLog{
 		UserId:          userId,
 		RechargeChannel: channel,
@@ -31,6 +37,7 @@ func (this *SystemMgr) PreRecharge(userId, channel, payType, amount int, payOrde
 		RechargeTime:    time.Now(),
 		FinishTime:      time.Unix(0, 0),
 		SendTime:        time.Unix(0, 0),
+		AgentId:         player.AgentId,
 	}
 	_, err = o.Insert(&rechargeData)
 	if err != nil {
@@ -40,8 +47,7 @@ func (this *SystemMgr) PreRecharge(userId, channel, payType, amount int, payOrde
 }
 func (this *SystemMgr) FinishRecharge(payOrder string) (err error) {
 	o := orm.NewOrm()
-	var rechargeData models.RechargeLog
-	if _, err = o.QueryTable(rechargeData).Filter("TransactionId", payOrder).Update(orm.Params{"Finished": 1, "FinishTime": time.Now()}); err != nil {
+	if _, err = o.QueryTable(new(models.RechargeLog)).Filter("TransactionId", payOrder).Filter("Finished", 0).Update(orm.Params{"Finished": 1, "FinishTime": time.Now()}); err != nil {
 		return
 	}
 	return
@@ -61,4 +67,15 @@ func (this *SystemMgr) ChangeConfig(key, value string) (err error) {
 		err = beego.AppConfig.SaveConfigFile("conf/app.conf")
 	}
 	return
+}
+func (this *SystemMgr) PageVisitor(input *context.BeegoInput, session interface{}) {
+	visitData := models.LogPageVisit{
+		Page:      input.URI(),
+		Method:    input.Method(),
+		Params:    fmt.Sprintf("%+v", input.Context.Request.PostForm),
+		User:      fmt.Sprintf("%+v", session),
+		VisitTime: time.Now(),
+	}
+	o := orm.NewOrm()
+	o.Insert(&visitData)
 }

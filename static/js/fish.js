@@ -175,38 +175,86 @@ var fishApp = {
         },
         bankType: function (b) {
             switch (b) {
-                case 1:                    return "工商银行";
-                case   2:                    return "农业银行";
-                case   3    :                    return "中国银行";
-                case   4    :                    return "建设银行";
-                case   5    :                    return "招商银行";
-                case  6    :                    return "交通银行";
-                case   7    :                    return "光大银行";
-                case 8    :                    return "华夏银行";
-                case 9    :                    return "广发银行";
-                case 10    :                    return "北京银行";
-                case 11    :                    return "北京农商行";
-                case 12    :                    return "上海银行";
-                case 13    :                    return "上海农商银行";
-                case  14    :                    return "渤海银行";
-                case 15    :                    return "杭州银行";
-                case 16    :                    return "广州市商业银行";
-                case 17    :                    return "中信银行";
-                case 18    :                    return "中国邮储银行";
-                case 19    :                    return "兴业银行";
-                case 20    :                    return "民生银行";
-                case  21    :                    return "平安银行";
-                case  22    :                    return "浦发银行";
-                case    23    :                    return "杭州联合银行";
-                case   24    :                    return "宁波银行";
-                case   25    :                    return "南京银行";
-                case   26    :                    return "温州市商业银行";
-                case    27    :                    return "长沙银行";
-                case    28    :                    return "集友银行";
-                case   29    :                    return "浙商银行";
-                case   30    :                    return "浙江稠州商业银行";
-                case   31    :                    return "广州市农信社";
-                case   32    :                    return "汉口银行";
+                case 1:
+                    return "工商银行";
+                case   2:
+                    return "农业银行";
+                case   3    :
+                    return "中国银行";
+                case   4    :
+                    return "建设银行";
+                case   5    :
+                    return "招商银行";
+                case  6    :
+                    return "交通银行";
+                case   7    :
+                    return "光大银行";
+                case 8    :
+                    return "华夏银行";
+                case 9    :
+                    return "广发银行";
+                case 10    :
+                    return "北京银行";
+                case 11    :
+                    return "北京农商行";
+                case 12    :
+                    return "上海银行";
+                case 13    :
+                    return "上海农商银行";
+                case  14    :
+                    return "渤海银行";
+                case 15    :
+                    return "杭州银行";
+                case 16    :
+                    return "广州市商业银行";
+                case 17    :
+                    return "中信银行";
+                case 18    :
+                    return "中国邮储银行";
+                case 19    :
+                    return "兴业银行";
+                case 20    :
+                    return "民生银行";
+                case  21    :
+                    return "平安银行";
+                case  22    :
+                    return "浦发银行";
+                case    23    :
+                    return "杭州联合银行";
+                case   24    :
+                    return "宁波银行";
+                case   25    :
+                    return "南京银行";
+                case   26    :
+                    return "温州市商业银行";
+                case    27    :
+                    return "长沙银行";
+                case    28    :
+                    return "集友银行";
+                case   29    :
+                    return "浙商银行";
+                case   30    :
+                    return "浙江稠州商业银行";
+                case   31    :
+                    return "广州市农信社";
+                case   32    :
+                    return "汉口银行";
+            }
+        },
+        rechargeType: function (value) {
+            switch (value) {
+                case 22:
+                    return "支付宝";
+                case 23:
+                    return "微信";
+                case 30:
+                    return "网银";
+                case 99:
+                    return "官方直充";
+                case 101:
+                    return "活动赠送";
+                case 102:
+                    return "测试赠送"
             }
         },
         gold: function (value) {
@@ -214,6 +262,18 @@ var fishApp = {
         },
         rate: function (value) {
             return value + "%"
+        },
+        msgType: function (value) {
+            switch (value) {
+                case 1:
+                    return "客服消息";
+                case 2:
+                    return "商务消息";
+                case 3:
+                    return "全民代理消息";
+                case 4:
+                    return "系统消息";
+            }
         }
     },
     getGameName: function (id) {
@@ -244,12 +304,27 @@ var fishApp = {
                 }
             }
         })
+    },
+    balance: function () {
+        $.post(location.href, $("form").serializeArray(), function (result) {
+            if (checkLogin(result.state)) {
+                if (result.state === 0) {
+                    for (key in result.data) {
+                        $('#' + key).html(result.data[key]);
+                    }
+                }
+            }
+        })
     }
 };
 
 function checkLogin(state) {
     if (state === 20000) {
-        location.href = "./login";
+        location.href = "/agent/login";
+        return false
+    }
+    if (state === 40000){
+        location.href = "/admin/login";
         return false
     }
     return true

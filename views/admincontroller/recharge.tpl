@@ -20,6 +20,14 @@
                                placeholder="请输入玩家ID" required/>
                     </div>
                     <div class="form-group input-group">
+                        <span class="input-group-addon">充值方式</span>
+                        <select id="type" name="type" class="form-control">
+                            <option value="99">后台充值</option>
+                            <option value="101">活动赠送</option>
+                            <option value="102">测试赠送</option>
+                        </select>
+                    </div>
+                    <div class="form-group input-group">
                         <span class="input-group-addon">充值金额</span>
                         <input class="form-control" id="amount" name="amount" type="number"
                                placeholder="请输入充值金额" required/>

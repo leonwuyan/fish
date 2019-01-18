@@ -4,17 +4,6 @@ import (
 	"time"
 )
 
-type Player struct {
-	Id                int    `json:"id"`
-	NickName          string `json:"nick_name"`
-	GlobalNum         int    `json:"global_num"`
-	BankNum           int    `json:"bank_num"`
-	Tax               int    `json:"tax"`
-	TotalRechargeSum  int    `json:"total_recharge_sum"`
-	AllWithdrawAmount int    `json:"all_withdraw_amount"`
-	QmAgentId         int    `json:"qm_agent_id"`
-}
-
 //代理申请表
 type AgentApply struct {
 	Id        int       `orm:"column(Id);size(11);pk;auto;" json:"id"`
@@ -37,37 +26,6 @@ type AdminAccount struct {
 	Permissions string    `orm:"column(permissions)" json:"permissions"`
 	CreateTime  time.Time `orm:"column(create_time)" json:"create_time"`
 	FrozenTime  time.Time `orm:"column(frozen_time)" json:"frozen_time"`
-}
-
-//管理员给代理充值记录
-type AdminRechargeLog struct {
-	Id             int       `orm:"column(Id);size(11);" json:"id"`
-	RewardMoney    int       `orm:"column(RewardMoney);size(11);" json:"reward_money"`
-	AgentId        int       `orm:"column(AgentId);size(11);" json:"agent_id"`
-	RechargeTime   time.Time `orm:"column(RechargeTime);" json:"recharge_time"`
-	RechargeMoney  int64     `orm:"column(RechargeMoney);size(20);" json:"recharge_money"`
-	IsEffective    bool      `orm:"column(IsEffective);" json:"is_effective"`
-	IsProcessed    bool      `orm:"column(IsProcessed);" json:"is_processed"`
-	RechargeUserId int64     `orm:"column(RechargeUserId);size(20);" json:"recharge_user_id"`
-}
-type AdminActionLog struct {
-	Id            int
-	AdminId       int
-	AdminName     string
-	ActionType    int
-	ActionContent string
-	ActionTime    time.Time
-}
-
-type PlayLog struct {
-	Id         int       `orm:"column(Id)" json:"id"`
-	GameLogId  string    `orm:"column(GameLogId)" json:"game_log_id"`
-	StartGold  int64     `orm:"column(StartGold)" json:"start_gold"`
-	GoldChange int64     `orm:"column(GoldChange)" json:"gold_change"`
-	CreateTime time.Time `orm:"column(CreateTime)" json:"create_time"`
-	UserId     int       `orm:"column(UserId)" json:"user_id"`
-	GameId     int       `orm:"column(GameId)" json:"game_id"`
-	RoomId     int       `orm:"column(RoomId)" json:"room_id"`
 }
 type AgentFeeLog struct {
 	Id         int       `orm:"column(id)" json:"id"`
@@ -200,8 +158,128 @@ type BankCardInfo struct {
 	IsDefault  bool   `orm:"column(is_default)" json:"is_default"`
 }
 
-func (this *PlayLog) TableName() string {
-	return "playlog"
+type LoginLog struct {
+	Id        int       `orm:"column(Id)" json:"id"`
+	UserId    int       `orm:"column(UserId)" json:"user_id"`
+	LoginTime time.Time `orm:"column(LoginTime)"json:"login_time"`
+	Ip        int       `orm:"column(Ip)" json:"ip"`
+}
+type PlayLog struct {
+	Id         int       `orm:"column(Id)" json:"id"`
+	GameLogId  string    `orm:"column(GameLogId)" json:"game_log_id"`
+	StartGold  int64     `orm:"column(StartGold)" json:"start_gold"`
+	GoldChange int64     `orm:"column(GoldChange)" json:"gold_change"`
+	CreateTime time.Time `orm:"column(CreateTime)" json:"create_time"`
+	UserId     int       `orm:"column(UserId)" json:"user_id"`
+	GameId     int       `orm:"column(GameId)" json:"game_id"`
+	RoomId     int       `orm:"column(RoomId)" json:"room_id"`
+	AgentId    int       `orm:"column(AgentId)" json:"agent_id"`
+}
+type GoldChangeLog struct {
+	Id           int       `orm:"column(Id)" json:"id"`
+	UserId       int       `orm:"column(UserId)" json:"user_id"`
+	PlayerGold   int64     `orm:"column(PlayerGold)" json:"player_gold"`
+	BankGold     int64     `orm:"column(BankGold)" json:"bank_gold"`
+	GoldChange   int64     `orm:"column(GoldChange)" json:"gold_change"`
+	ChangeType   byte      `orm:"column(ChangeType)" json:"change_type"`
+	ChangeText   string    `orm:"column(ChangeText)" json:"change_text"`
+	ChangeTime   time.Time `orm:"column(ChangeTime)" json:"change_time"`
+	ExPlayerGold int64     `orm:"column(ExPlayerGold)" json:"ex_player_gold"`
+	ExBankGold   int64     `orm:"column(ExBankGold)" json:"ex_bank_gold"`
+	AgentId      int       `orm:"column(AgentId)" json:"agent_id"`
+}
+type PumpLogDetail struct {
+	Id         int       `orm:"column(Id)" json:"id"`
+	UserId     int       `orm:"column(UserId)" json:"user_id"`
+	CreateTime time.Time `orm:"column(CreateTime)" json:"create_time"`
+	Pumping    int       `orm:"column(Pumping)" json:"pumping"`
+	GameId     int       `orm:"column(GameId)" json:"game_id"`
+	RoomId     int       `orm:"column(RoomId)" json:"room_id"`
+	AgentId    int       `orm:"column(AgentId)" json:"agent_id"`
+}
+type LogPageVisit struct {
+	Id        int       `orm:"column(id)" json:"id"`
+	Page      string    `orm:"column(page)" json:"page"`
+	Method    string    `orm:"column(method)" json:"method"`
+	Params    string    `orm:"column(params)" json:"params"`
+	User      string    `orm:"column(user)" json:"user"`
+	VisitTime time.Time `orm:"column(visit_time)" json:"visit_time"`
+}
+type ChatMessages struct {
+	Id            int       `orm:"column(Id)" json:"id"`
+	CreationTime  time.Time `orm:"column(CreationTime)" json:"creation_time"`
+	UserId        int       `orm:"column(UserId)" json:"user_id"`
+	MessageType   int       `orm:"column(MessageType)" json:"message_type"`
+	Message       string    `orm:"column(Message)" json:"message"`
+	IsProcessed   bool      `orm:"column(IsProcessed)" json:"is_processed"`
+	KefuId        int       `orm:"column(KefuId)" json:"kefu_id"`
+	IsUserMessage bool      `orm:"column(IsUserMessage)" json:"is_user_message"`
+	IsDeleted     bool      `orm:"column(IsDeleted)" json:"is_deleted"`
+}
+
+//配置部分
+type Channel struct {
+	Id                      int    `orm:"column(Id)"`
+	ChannelId               int    `orm:"column(ChannelId)"`               //渠道编号
+	ChannelName             string `orm:"column(ChannelName)"`             //渠道名称
+	MainChannel             string `orm:"column(MainChannel)"`             //主渠道
+	Platform                string `orm:"column(Platform)"`                //平台
+	ServerVersion           int    `orm:"column(ServerVersion)"`           //服务器版本
+	GameShow                bool   `orm:"column(gameshow)"`                //是否在游戏中显示
+	IsTiXianEnabled         bool   `orm:"column(IsTiXianEnabled)"`         //是否启用提现
+	MaxTiXianGold           int    `orm:"column(MaxTiXianGold)"`           //最大提现金额
+	PayUrl                  string `orm:"column(PayUrl)"`                  //充值的Url
+	GameIdentifier          string `orm:"column(GameIdentifier)"`          //不知道
+	IapName                 string `orm:"column(IapName)"`                 //不知道
+	InitMoney               int    `orm:"column(InitMoney)"`               //游客注册赠送金币
+	UpAccountMoney          int    `orm:"column(UpAccountMoney)"`          //升级正式账号赠送金币
+	Remarks                 string `orm:"column(Remarks)"`                 //介绍？
+	IsAgentTiXianEnabled    bool   `orm:"column(IsAgentTiXianEnabled)"`    //代理提现是否启用
+	IsBankCardTiXianEnabled bool   `orm:"column(IsBankCardTiXianEnabled)"` //银行卡提现是否启用
+	IsBankBindingEnabled    bool   `orm:"column(IsBankBindingEnabled)"`    //银行卡绑定是否启用
+	IsUnionPayEnabled       bool   `orm:"column(IsUnionPayEnabled)"`       //银联充值是否启用
+	IsQQPayEnabled          bool   `orm:"column(IsQQPayEnabled)"`          //QQ充值是否开启
+	IsJDPayEnabled          bool   `orm:"column(IsJDPayEnabled)"`          //京东充值是否启用
+	IsWxPayEnabled          bool   `orm:"column(IsWxPayEnabled)"`          //微信充值是否开启
+	IsAlipayEnabled         bool   `orm:"column(IsAlipayEnabled)"`         //支付宝充值是否开启
+	UpdateCount             string `orm:"column(UpdateCount)"`             //更新次数
+	IsDkPayEnabled          bool   `orm:"column(IsDkPayEnabled)"`          //点卡支付是否开启
+	IsAliTixianEnabeld      bool   `orm:"column(IsAliTixianEnabeld)"`      //是否允许支付宝提现
+	IsAliBindingEnabled     bool   `orm:"column(IsAliBindingEnabled)"`     //是否打开支付宝绑定
+	SubPlatformName         string `orm:"column(SubPlatformName)"`         //分平台名称
+}
+type AgentShow struct {
+	AgentId          int    `orm:"column(AgentId);pk"`
+	AgentName        string `orm:"column(AgentName)"`        //代理商名称，登陆页面使用
+	Password         string `orm:"column(Password)"`         //登陆密码
+	Payment          string `orm:"column(Payment)"`          //充值密码
+	SignKey          string `orm:"column(SignKey)"`          //加密串密钥
+	Remarks          string `orm:"column(Remarks)"`          //代理商描述，游戏内显示名称
+	QQ               string `orm:"column(QQ)"`               //代理商QQ号码
+	WenXin           string `orm:"column(WenXin)"`           //代理商微信号码
+	Gold             int64  `orm:"column(Gold)"`             //代理商余额,单位分
+	IsUse            bool   `orm:"column(IsUse)"`            //是否可用
+	Level            int    `orm:"column(Level)"`            //等级:1.内部商人、优先级最高;2.集团外商、优先级次等;3.嫡系商人、非集团控制的嫡系合作商人;4.普通商人、市面上合作的商人\\\\n
+	ShowInGame       bool   `orm:"column(ShowInGame)"`       //是否在游戏里显示该代理商
+	MinGold          int64  `orm:"column(MinGold)"`          //保底金额
+	IsMinGoldEnabled bool   `orm:"column(IsMinGoldEnabled)"` //是否启用保底金额
+	UpdateCount      int    `orm:"column(UpdateCount)"`      //更新次数
+	ChannelId        int    `orm:"column(ChannelId)"`        //渠道Id
+}
+type Notice struct {
+	Id         int       `orm:"column(Id)"`         //自增长编号//,
+	ChannelId  int       `orm:"column(ChannelId)"`  //渠道编号
+	StartTime  time.Time `orm:"column(StartTime)"`  //开始时间
+	EndTime    time.Time `orm:"column(EndTime)"`    //结束时间
+	Content    string    `orm:"column(Content)"`    //内容
+	Title      string    `orm:"column(Title)"`      //标题
+	CreateTime time.Time `orm:"column(CreateTime)"` //创建时间
+	IsActive   bool      `orm:"column(IsActive)"`   //是否启用
+	Url        string    `orm:"column(Url)"`        //官网Url
+}
+
+func (this *AgentApply) TableName() string {
+	return "agentapply"
 }
 func (this *SmsLog) TableName() string {
 	return "smslog"
@@ -217,6 +295,33 @@ func (this *RechargeLog) TableName() string {
 }
 func (this *BankCardConfig) TableName() string {
 	return "bankcardconfig"
+}
+func (this *PlayLog) TableName() string {
+	return "v_playlog"
+}
+func (this *LoginLog) TableName() string {
+	return "loginlog"
+}
+func (this *GoldChangeLog) TableName() string {
+	return "v_goldchangelog"
+}
+func (this *PumpLogDetail) TableName() string {
+	return "v_pumplogdetail"
+}
+func (this *LogPageVisit) TableName() string {
+	return "log_page_visit"
+}
+func (this *ChatMessages) TableName() string {
+	return "chatmessages"
+}
+func (this *Channel) TableName() string {
+	return "channel"
+}
+func (this *AgentShow) TableName() string {
+	return "agent"
+}
+func (this *Notice) TableName() string {
+	return "notice"
 }
 
 func (this *AgentAccount) TableUnique() [][]string {

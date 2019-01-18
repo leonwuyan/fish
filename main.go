@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	bs "encoding/base64"
+	"fish/configs"
 	"fish/controllers"
+	"fish/fishServer"
 	"fish/managers"
 	"fish/models"
 	_ "fish/routers"
@@ -13,6 +15,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"html/template"
 	"image/png"
+	"strconv"
 )
 
 var logPath = "./logs"
@@ -28,6 +31,10 @@ func init() {
 func main() {
 	models.RegisterDB()
 	managers.TaskInstance.Init()
+	gameServerIp := configs.GameServer["ip"]
+	gameServerPort, _ := strconv.Atoi(configs.GameServer["port"])
+	gameServerSign, _ := strconv.Atoi(configs.GameServer["sign"])
+	go fishServer.Start(gameServerIp, gameServerPort, gameServerSign)
 	beego.Run()
 }
 func createQr(msg string) template.HTML {

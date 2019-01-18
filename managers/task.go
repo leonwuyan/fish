@@ -49,7 +49,7 @@ func (this *TaskMgr) agentFee() (err error) {
 			lastLoadId = strconv.Itoa(playLog.Id)
 		}
 		if lastLoadId != configs.Data["last_play_log"] {
-			SystemInstanse.ChangeConfig("data::last_play_log", lastLoadId)
+			SystemInstance.ChangeConfig("data::last_play_log", lastLoadId)
 		}
 		AgentFeeBlock = false
 	}
@@ -66,13 +66,13 @@ func (this *TaskMgr) smsSend() (err error) {
 			logs.Error(err)
 		}
 		for _, smsLog := range smsLogs {
-			if err = SystemInstanse.SendSms(smsLog.PhoneNumber, smsLog.Text); err != nil {
+			if err = SystemInstance.SendSms(smsLog.PhoneNumber, smsLog.Text); err != nil {
 				logs.Error("send sms failed,log_id:%d,reason:%s", smsLog.Id, err.Error())
 			}
 			lastSmsId = strconv.Itoa(smsLog.Id)
 		}
 		if lastSmsId != configs.Data["last_sms_log"] {
-			SystemInstanse.ChangeConfig("data::last_sms_log", lastSmsId)
+			SystemInstance.ChangeConfig("data::last_sms_log", lastSmsId)
 		}
 		SmsBlock = false
 	}
@@ -95,7 +95,7 @@ func (this *TaskMgr) agentBind() (err error) {
 			lastBindId = strconv.Itoa(bindLog.Id)
 		}
 		if lastBindId != configs.Data["last_bind_agent"] {
-			SystemInstanse.ChangeConfig("data::last_bind_agent", lastBindId)
+			SystemInstance.ChangeConfig("data::last_bind_agent", lastBindId)
 		}
 		agentBindBlock = false
 	}

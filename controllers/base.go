@@ -21,6 +21,7 @@ var cpt *captcha.Captcha
 
 type baseController struct {
 	beego.Controller
+	sc_Chan chan models.Result
 }
 
 func init() {
@@ -31,7 +32,6 @@ func init() {
 	cpt.StdWidth = 100
 	beego.AddFuncMap("year", time.Now().Year)
 	beego.AddFuncMap("v", verifyPower)
-	beego.AddFuncMap("today", time.Today)
 }
 func (c *baseController) Prepare() {
 	c.Data["rand"] = rand.Int()
@@ -42,10 +42,12 @@ func (c *baseController) jsonData(code enums.ReturnCode, params ...interface{}) 
 	var total int
 	if len(params) > 0 {
 		data = params[0]
-		if reflect.TypeOf(params[1]) == reflect.TypeOf(int(1)) {
-			total = params[1].(int)
-		} else if reflect.TypeOf(params[1]) == reflect.TypeOf(int64(1)) {
-			total = int(params[1].(int64))
+		if len(params) > 1 {
+			if reflect.TypeOf(params[1]) == reflect.TypeOf(int(1)) {
+				total = params[1].(int)
+			} else if reflect.TypeOf(params[1]) == reflect.TypeOf(int64(1)) {
+				total = int(params[1].(int64))
+			}
 		}
 	}
 	return models.Result{
@@ -58,7 +60,8 @@ func (c *baseController) jsonData(code enums.ReturnCode, params ...interface{}) 
 func verifyPower(admin models.AdminAccount, code int) bool {
 	for _, per := range strings.Split(admin.Permissions, ",") {
 		iPer, _ := strconv.Atoi(per)
-		if iPer == 999 {
+		//999是所有权限，0是不需要权限
+		if iPer == 999 || code == 0 {
 			return true
 		} else {
 			if iPer == code {

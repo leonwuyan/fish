@@ -20,7 +20,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/static/js/bootstrap-table/bootstrap-table.js"></script>
     <script src="/static/js/bootstrap-table/i18n/bootstrap-table-zh-cn.js"></script>
-    <script src="/static/js/fish.js?"></script>
+    <script src="/static/js/fish.js"></script>
+    <script src="/static/js/message.js"></script>
     <script>
         toastr.options.positionClass = 'toast-center-center';
     </script>
@@ -69,6 +70,16 @@
                 <li>
                     <a href="{{.host}}"><i class="fa fa-home"></i> 首页</a>
                 </li>
+            {{if v .user .powers.结算.收益结算}}
+                <li>
+                    <a href="{{.host}}balance"><i class="fa fa-balance-scale"></i> 收益结算</a>
+                </li>
+            {{end}}
+            {{if v .user .powers.充值.后台充值}}
+                <li>
+                    <a href="{{.host}}recharge"><i class="fa fa-dollar"></i> 后台充值</a>
+                </li>
+            {{end}}
             {{if v .user .powers.管理员.管理员列表}}
                 <li>
                     <a href="{{.host}}admin/list"><i class="fa fa-user-o"></i> 账号管理</a>
@@ -111,10 +122,15 @@
                     </ul>
                 </li>
             {{end}}
-            {{if v .user .powers.充值.后台充值}}
-                <li>
-                    <a href="{{.host}}recharge"><i class="fa fa-dollar"></i> 后台充值</a>
-                </li>
+            {{if v .user .powers.客服.消息}}
+            <li>
+                <a href="#"><i class="fa fa-user-secret"></i> 客服<span
+                        class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li>
+                        <a href="{{.host}}services/message"><i class="fa fa-list"></i> 消息管理</a>
+                    </li>
+                </ul>
             {{end}}
             {{if v .user .powers.数据统计.在线数据}}
                 <li>
@@ -160,7 +176,15 @@
             {{end}}
             {{if v .user .powers.系统.系统配置}}
                 <li>
-                    <a href="{{.host}}sysconfig"><i class="fa fa-cog"></i> 系统配置</a>
+                    <a href="#"><i class="fa fa-cog"></i> 系统配置<span
+                            class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                    {{if v .user .powers.系统.后台配置}}
+                        <li>
+                            <a href="{{.host}}sys/config">后台配置</a>
+                        </li>
+                    {{end}}
+                    </ul>
                 </li>
             {{end}}
             </ul>

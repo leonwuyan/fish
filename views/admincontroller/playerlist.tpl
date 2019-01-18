@@ -44,6 +44,7 @@
         {title: '累计税收', field: 'tax'},
         {title: '充值金额', field: 'total_recharge_sum'},
         {title: '提现金额', field: 'all_withdraw_amount', formatter: fishApp.formatter.gold},
+        {title: '注册时间', field: 'rsg_log_time'},
     ];
     dataurl =location.href;
     showFooter = false;

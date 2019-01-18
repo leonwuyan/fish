@@ -18,6 +18,7 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -27,6 +28,10 @@ type MainController struct {
 	baseController
 }
 
+func (c *MainController) Prepare() {
+	c.baseController.Prepare()
+	managers.SystemInstance.PageVisitor(c.Ctx.Input, nil)
+}
 func (c *MainController) Index() {
 	c.Data["Website"] = "beego.me"
 	c.Data["Email"] = "astaxie@gmail.com"
@@ -47,10 +52,11 @@ func (c *MainController) Advertise() {
 }
 
 func (c *MainController) Recharge() {
-	userId, _ := c.GetInt("userid")
+	userId, _ := c.GetInt("userId")
 	channel, _ := c.GetInt("channel")
 	amount, _ := c.GetFloat("pay_amt")
 	pay_type, _ := c.GetInt("pay_type")
+	amount = math.Floor(amount)
 	var PaymentAction map[enums.PaymentChannel]func(userId, channel, pay_type int, amount float64)
 	PaymentAction = make(map[enums.PaymentChannel]func(userId, channel, pay_type int, amount float64))
 	PaymentAction[enums.PAY_CHANNEL_HUIYI] = c.RechargeHuiYi
@@ -85,7 +91,7 @@ func (c *MainController) RechargeHuiYi(userId, channel, pay_type int, amount flo
 	//pay_type, _ := c.GetInt("pay_type")
 	//deviceid := c.GetString("deviceid")
 	pay_order := payment.Create_order()
-	err := managers.SystemInstanse.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
+	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
 	if err != nil {
 		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
 		c.Abort("10001")
@@ -106,7 +112,7 @@ func (c *MainController) RechargeWoHuiBao(userId, channel, pay_type int, amount 
 	//amount, _ := c.GetFloat("pay_amt")
 	//pay_type, _ := c.GetInt("pay_type")
 	pay_order := payment.Create_order()
-	err := managers.SystemInstanse.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
+	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
 	if err != nil {
 		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
 		c.Abort("10001")
@@ -124,7 +130,7 @@ func (c *MainController) RechargeWoHuiBao(userId, channel, pay_type int, amount 
 }
 func (c *MainController) RechargeHongJia(userId, channel, pay_type int, amount float64) {
 	pay_order := payment.Create_order()
-	err := managers.SystemInstanse.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
+	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
 	if err != nil {
 		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
 		c.Abort("10001")
@@ -142,7 +148,7 @@ func (c *MainController) RechargeHongJia(userId, channel, pay_type int, amount f
 }
 func (c *MainController) RechargeZongHeng(userId, channel, pay_type int, amount float64) {
 	pay_order := payment.Create_order()
-	err := managers.SystemInstanse.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
+	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
 	if err != nil {
 		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
 		c.Abort("10001")
@@ -161,7 +167,7 @@ func (c *MainController) RechargeZongHeng(userId, channel, pay_type int, amount 
 func (c *MainController) RechargeYiJia(userId, channel, pay_type int, amount float64) {
 	c.TplName = "payPost.tpl"
 	pay_order := payment.Create_order()
-	err := managers.SystemInstanse.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
+	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
 	if err != nil {
 		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
 		c.Abort("10001")
@@ -191,7 +197,7 @@ func (c *MainController) Notify_Hui_Yi() {
 	result := huiyi.NotifyResult(params)
 	logs.Info(params)
 	if result == "SUCCESS" {
-		if err := managers.SystemInstanse.FinishRecharge(params["trade_no"]); err != nil {
+		if err := managers.SystemInstance.FinishRecharge(params["trade_no"]); err != nil {
 			logs.Error(err)
 			result = "Recharge fail"
 		}
@@ -211,7 +217,7 @@ func (c *MainController) Notify_Wo_Hui_Bao() {
 	result := wohuibao.NotifyResult(params)
 	logs.Info(params)
 	if result == "SUCCESS" {
-		if err := managers.SystemInstanse.FinishRecharge(params["orderid"]); err != nil {
+		if err := managers.SystemInstance.FinishRecharge(params["orderid"]); err != nil {
 			logs.Error(err)
 			result = "Recharge fail"
 		}
@@ -231,7 +237,7 @@ func (c *MainController) Notify_Hong_Jia() {
 	logs.Info(params)
 	result := hongjia.NotifyResult(params)
 	if result == "SUCCESS" {
-		if err := managers.SystemInstanse.FinishRecharge(params["sdorderno"]); err != nil {
+		if err := managers.SystemInstance.FinishRecharge(params["sdorderno"]); err != nil {
 			logs.Error(err)
 			result = "Recharge fail"
 		}
@@ -247,7 +253,7 @@ func (c *MainController) Notify_Zong_Heng() {
 	logs.Info(params)
 	result := hongjia.NotifyResult(params)
 	if result == "SUCCESS" {
-		if err := managers.SystemInstanse.FinishRecharge(params["sdorderno"]); err != nil {
+		if err := managers.SystemInstance.FinishRecharge(params["sdorderno"]); err != nil {
 			logs.Error(err)
 			result = "Recharge fail"
 		}
@@ -266,7 +272,7 @@ func (c *MainController) Notify_Yi_Jia() {
 	logs.Info(params)
 	result := yijia.NotifyResult(params)
 	if result == "SUCCESS" {
-		if err := managers.SystemInstanse.FinishRecharge(params["orderid"]); err != nil {
+		if err := managers.SystemInstance.FinishRecharge(params["orderid"]); err != nil {
 			logs.Error(err)
 			result = "Recharge fail"
 		} else {
@@ -330,6 +336,14 @@ func (c *MainController) GetPostForms() {
 		formParams = append(formParams, map[string]interface{}{"id": "admin_name", "name": "用 户 名", "value": admin.Name, "type": "text", "required": "true", "readonly": "true"})
 		formParams = append(formParams, map[string]interface{}{"id": "admin_powers", "name": "权限设置", "value": values, "checked": admin.Permissions, "type": "checkbox", "required": "true"})
 		break
+	case "add_service_msg":
+		formParams = append(formParams, map[string]interface{}{"id": "title", "value": "回复消息"})
+		formParams = append(formParams, map[string]interface{}{"id": "action", "value": "add_service_msg", "type": "hidden"})
+		formParams = append(formParams, map[string]interface{}{"id": "msg_id", "value": c.GetString("id"), "type": "hidden"})
+		formParams = append(formParams, map[string]interface{}{"id": "msg_type", "value": "1", "type": "hidden"})
+		formParams = append(formParams, map[string]interface{}{"id": "user_id", "name": "用户ID", "value": c.GetString("uid"), "type": "text", "required": "true"})
+		formParams = append(formParams, map[string]interface{}{"id": "msg_content", "name": "消息内容", "value": "", "type": "text", "required": "true"})
+		break
 	default:
 		break
 	}
@@ -391,8 +405,8 @@ func yiJiaType(payType int) yijia.PayType {
 		return yijia.PAY_TYPE_ALIPAY
 	case 30:
 		return yijia.PAY_TYPE_WECHAT
-	//case 23:
-	//	return yijia.PAY_TYPE_BANK
+		//case 23:
+		//	return yijia.PAY_TYPE_BANK
 	default:
 		return yijia.PAY_TYPE_ALIPAY
 	}
