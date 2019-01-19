@@ -3,6 +3,7 @@ package managers
 import (
 	"encoding/json"
 	"fish/enums"
+	"fish/fishServer"
 	"fish/models"
 	"fish/payment"
 	"github.com/astaxie/beego/logs"
@@ -249,7 +250,7 @@ func (this *AdminMgr) AddCustomServiceMsg(account models.AdminAccount, userId in
 		KefuId:       account.Id,
 	}
 	o.Insert(&data)
-	ServerInstance.SendMsg(userId, account.Id)
+	ServerInstance.SendMsg(userId)
 	return enums.SUCCESS
 }
 
@@ -599,4 +600,34 @@ func (this *AdminMgr) IsNewMessage() (hasCashApply, hasChat int64) {
 	hasCashApply, _ = o.QueryTable(new(models.PlayerCashLog)).Filter("State", 0).Count()
 	hasChat, _ = o.QueryTable(new(models.ChatMessages)).Filter("IsProcessed", false).Filter("IsUserMessage", true).Count()
 	return
+}
+
+func (this *AdminMgr) GetChannelInfo(id int) (channel models.Channel, err error) {
+	o := orm.NewOrm()
+	err = o.QueryTable(channel).Filter("Id", id).One(&channel)
+	return
+}
+func (this *AdminMgr) ChangeChannelInfo(data models.Channel) enums.ReturnCode {
+	o := orm.NewOrm()
+	if _, err := o.Update(&data, "Remarks", "QQ", "WenXin", "ShowInGame"); err != nil {
+		return enums.DB_ACTION_ERROR
+	}
+	fishServer.FishInstance.ChangeChannelConfig(data.ChannelId, false)
+	return enums.SUCCESS
+}
+func (this *AdminMgr) GetShowAgentInfo(id int) (agent models.AgentShow, err error) {
+	o := orm.NewOrm()
+	err = o.QueryTable(agent).Filter("AgentId", id).One(&agent)
+	return
+}
+func (this *AdminMgr) ChangeShowAgentInfo(data models.AgentShow) enums.ReturnCode {
+	o := orm.NewOrm()
+	if _, err := o.Update(&data, "Remarks", "QQ", "WenXin", "ShowInGame"); err != nil {
+		return enums.DB_ACTION_ERROR
+	}
+	fishServer.FishInstance.ChangeAgentConfig(data.AgentId, false)
+	return enums.SUCCESS
+}
+func (this *AdminMgr) GetNotice() {
+
 }

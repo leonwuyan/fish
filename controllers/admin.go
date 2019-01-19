@@ -156,6 +156,32 @@ func (c *AdminController) ChannelInfo() {
 func (c *AdminController) ShowAgentList() {
 
 }
+func (c *AdminController) ShowAgentInfo() {
+	id, _ := c.GetInt("id")
+	agent, err := managers.AdminInstance.GetShowAgentInfo(id)
+	if err != nil {
+		c.Data["err"] = enums.QUERY_DATA_ERROR.String()
+		logs.Error(err)
+	} else {
+		c.Data["data"] = agent
+	}
+	if c.Ctx.Input.IsPut() {
+		agent_id, _ := c.GetInt("agent_id")
+		remarks := c.GetString("remark")
+		show := c.GetString("show")
+		qq := c.GetString("qq")
+		weChat := c.GetString("wx")
+		data := models.AgentShow{
+			AgentId:    agent_id,
+			Remarks:    remarks,
+			QQ:         qq,
+			WenXin:     weChat,
+			ShowInGame: show == "on",
+		}
+		c.Data["json"] = c.jsonData(managers.AdminInstance.ChangeShowAgentInfo(data))
+		c.ServeJSON()
+	}
+}
 func (c *AdminController) NoticeList() {
 
 }
@@ -602,6 +628,7 @@ func (c *AdminController) Balance() {
 	}
 }
 
+//后台配置
 func (c *AdminController) SystemConfig() {
 	c.verify_page(configs.AdminPower["系统"]["系统配置"])
 	c.Data["site"] = configs.Site

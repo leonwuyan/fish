@@ -184,6 +184,11 @@
                             <a href="{{.host}}sys/config">后台配置</a>
                         </li>
                     {{end}}
+                    {{if v .user .powers.系统.代理配置}}
+                        <li>
+                            <a href="{{.host}}sys/agent">代理配置</a>
+                        </li>
+                    {{end}}
                     </ul>
                 </li>
             {{end}}
