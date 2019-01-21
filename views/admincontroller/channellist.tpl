@@ -33,7 +33,7 @@
         {title: '微信', field: 'wen_xin'},
         {
             title: '操作', formatter: function (value, row) {
-                return '<a href="{{.host}}sys/agent?id="' + row.agent_id + '>详细信息</a>'
+                return '<a href="{{.host}}sys/channel?id="' + row.agent_id + '>详细信息</a>'
             }
         }
     ];

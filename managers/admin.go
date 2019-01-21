@@ -602,6 +602,13 @@ func (this *AdminMgr) IsNewMessage() (hasCashApply, hasChat int64) {
 	return
 }
 
+func (this *AdminMgr) GetAllChannels(account models.AdminAccount, pageSize, pageIndex int, searchParams string) (total int64, channels []models.Channel, err error) {
+	o := orm.NewOrm()
+	rs := o.QueryTable(new(models.Channel))
+	total, _ = rs.Count()
+	_, err = rs.Limit(pageSize, (pageIndex-1)*pageSize).All(&channels)
+	return
+}
 func (this *AdminMgr) GetChannelInfo(id int) (channel models.Channel, err error) {
 	o := orm.NewOrm()
 	err = o.QueryTable(channel).Filter("Id", id).One(&channel)

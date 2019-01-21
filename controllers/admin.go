@@ -147,11 +147,34 @@ func (c *AdminController) handlerClientMessage() {
 
 //游戏配置
 func (c *AdminController) ChannelList() {
-
+	c.verify_page(configs.AdminPower["系统"]["渠道配置"])
+	if c.Ctx.Input.IsPost() {
+		pageSize, _ := c.GetInt("pageSize")
+		pageIndex, _ := c.GetInt("pageIndex")
+		searchParams := c.GetString("searchParams")
+		total, channels, err := managers.AdminInstance.GetAllChannels(c.admin, pageSize, pageIndex, searchParams)
+		if err == nil {
+			if channels == nil {
+				channels = []models.Channel{}
+			}
+			c.Data["json"] = c.jsonData(enums.SUCCESS, channels, total)
+		} else {
+			c.Data["json"] = c.jsonData(enums.QUERY_DATA_ERROR)
+			logs.Error(err)
+		}
+		c.ServeJSON()
+	}
 }
 func (c *AdminController) ChannelInfo() {
+	c.verify_page(configs.AdminPower["系统"]["渠道配置"])
 	id, _ := c.GetInt("id")
-	println(id)
+	channel, err := managers.AdminInstance.GetChannelInfo(id)
+	if err != nil {
+		c.Data["err"] = enums.QUERY_DATA_ERROR.String()
+		logs.Error(err)
+	} else {
+		c.Data["data"] = channel
+	}
 }
 func (c *AdminController) ShowAgentList() {
 	c.verify_page(configs.AdminPower["系统"]["代理配置"])
@@ -200,7 +223,34 @@ func (c *AdminController) ShowAgentInfo() {
 	}
 }
 func (c *AdminController) NoticeList() {
-
+	c.verify_page(configs.AdminPower["系统"]["公告配置"])
+	if c.Ctx.Input.IsPost() {
+		pageSize, _ := c.GetInt("pageSize")
+		pageIndex, _ := c.GetInt("pageIndex")
+		searchParams := c.GetString("searchParams")
+		total, channels, err := managers.AdminInstance.GetAllChannels(c.admin, pageSize, pageIndex, searchParams)
+		if err == nil {
+			if channels == nil {
+				channels = []models.Channel{}
+			}
+			c.Data["json"] = c.jsonData(enums.SUCCESS, channels, total)
+		} else {
+			c.Data["json"] = c.jsonData(enums.QUERY_DATA_ERROR)
+			logs.Error(err)
+		}
+		c.ServeJSON()
+	}
+}
+func (c *AdminController) NoticeInfo() {
+	c.verify_page(configs.AdminPower["系统"]["公告配置"])
+	id, _ := c.GetInt("id")
+	agent, err := managers.AdminInstance.GetShowAgentInfo(id)
+	if err != nil {
+		c.Data["err"] = enums.QUERY_DATA_ERROR.String()
+		logs.Error(err)
+	} else {
+		c.Data["data"] = agent
+	}
 }
 
 //功能部分

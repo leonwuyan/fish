@@ -27,9 +27,12 @@ func init() {
 		beego.NSRouter("/logout", &controllers.AdminController{}, "*:Logout"),
 		beego.NSRouter("/changepwd", &controllers.AdminController{}, "*:ChangePwd"),
 		beego.NSRouter("/sys/config", &controllers.AdminController{}, "*:SystemConfig"),
+		beego.NSRouter("/sys/channels", &controllers.AdminController{}, "*:ChannelList"),
 		beego.NSRouter("/sys/channel", &controllers.AdminController{}, "*:ChannelInfo"),
 		beego.NSRouter("/sys/agents", &controllers.AdminController{}, "*:ShowAgentList"),
 		beego.NSRouter("/sys/agent", &controllers.AdminController{}, "*:ShowAgentInfo"),
+		beego.NSRouter("/sys/notices", &controllers.AdminController{}, "*:NoticeList"),
+		beego.NSRouter("/sys/notice", &controllers.AdminController{}, "*:NoticeInfo"),
 
 		beego.NSRouter("/admin/list", &controllers.AdminController{}, "*:AdminList"),
 
