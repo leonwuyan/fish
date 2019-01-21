@@ -12,7 +12,7 @@ var m_GameServer_Conn net.Conn
 var m_ServerIp string
 var m_clientValue int
 var heartBeat = CMD_BASE{65535, 255, 255}
-var m_IsConnection = false
+var m_IsConnected = false
 var m_IsStop = false
 var m_ConnDeadTime = time.Now()
 var m_TimeOut = 5
@@ -38,18 +38,18 @@ func Stop() {
 }
 func Disconnection() {
 	m_GameServer_Conn.Close()
-	m_IsConnection = false
+	m_IsConnected = false
 }
 func Connection() (err error) {
 	m_GameServer_Conn, err = net.Dial("tcp", m_ServerIp)
 	if err != nil {
 		println("连接游戏服务器失败")
-		m_IsConnection = false
+		m_IsConnected = false
 	} else {
 		println("连接游戏服务器成功")
 		m_ConnDeadTime = time.Now().Add(time.Duration(m_TimeOut) * time.Second)
 		m_GameServer_Conn.SetDeadline(m_ConnDeadTime)
-		m_IsConnection = true
+		m_IsConnected = true
 	}
 	return
 }
@@ -60,7 +60,7 @@ func ReConnection() {
 }
 func handlerSend() {
 	for {
-		if m_IsConnection {
+		if m_IsConnected {
 			cmd := <-CS_CHAN
 			_, err := m_GameServer_Conn.Write(CmdToBytes(cmd))
 			if err != nil {
@@ -75,7 +75,7 @@ func handlerSend() {
 }
 func handlerReceive() {
 	for {
-		if m_IsConnection {
+		if m_IsConnected {
 			if time.Now().After(m_ConnDeadTime) {
 				Disconnection()
 				continue
