@@ -615,6 +615,13 @@ func (this *AdminMgr) ChangeChannelInfo(data models.Channel) enums.ReturnCode {
 	fishServer.FishInstance.ChangeChannelConfig(data.ChannelId, false)
 	return enums.SUCCESS
 }
+func (this *AdminMgr) GetAllShowAgents(account models.AdminAccount, pageSize, pageIndex int, searchParams string) (total int64, agents []models.AgentShow, err error) {
+	o := orm.NewOrm()
+	rs := o.QueryTable(new(models.AgentShow))
+	total, _ = rs.Count()
+	_, err = rs.Limit(pageSize, (pageIndex-1)*pageSize).All(&agents)
+	return
+}
 func (this *AdminMgr) GetShowAgentInfo(id int) (agent models.AgentShow, err error) {
 	o := orm.NewOrm()
 	err = o.QueryTable(agent).Filter("AgentId", id).One(&agent)

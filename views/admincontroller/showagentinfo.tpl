@@ -5,7 +5,7 @@
             <li><a href="{{.host}}">概况</a></li>
             <li><a href="#"> 游戏配置</a></li>
             <li><a href="{{.host}}channel/list"> 代理列表</a></li>
-            <li>代理信息</li>
+            <li>显示代理信息</li>
         </ol>
     </div>
 </div>
@@ -13,7 +13,7 @@
     <div class="col-md-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                代理信息
+                显示代理信息
             </div>
         {{if .err}}
             <div class="panel-body">
@@ -41,7 +41,7 @@
                                        placeholder=""/></td>
                         </tr>
                         <tr>
-                            <td>WenXin</td>
+                            <td>微信</td>
                             <td><input class="form-control" id="wx" name="wx" value="{{.data.WenXin}}"
                                        placeholder=""/></td>
                         </tr>

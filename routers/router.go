@@ -28,6 +28,7 @@ func init() {
 		beego.NSRouter("/changepwd", &controllers.AdminController{}, "*:ChangePwd"),
 		beego.NSRouter("/sys/config", &controllers.AdminController{}, "*:SystemConfig"),
 		beego.NSRouter("/sys/channel", &controllers.AdminController{}, "*:ChannelInfo"),
+		beego.NSRouter("/sys/agents", &controllers.AdminController{}, "*:ShowAgentList"),
 		beego.NSRouter("/sys/agent", &controllers.AdminController{}, "*:ShowAgentInfo"),
 
 		beego.NSRouter("/admin/list", &controllers.AdminController{}, "*:AdminList"),

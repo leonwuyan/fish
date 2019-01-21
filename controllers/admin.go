@@ -154,9 +154,26 @@ func (c *AdminController) ChannelInfo() {
 	println(id)
 }
 func (c *AdminController) ShowAgentList() {
-
+	c.verify_page(configs.AdminPower["系统"]["代理配置"])
+	if c.Ctx.Input.IsPost() {
+		pageSize, _ := c.GetInt("pageSize")
+		pageIndex, _ := c.GetInt("pageIndex")
+		searchParams := c.GetString("searchParams")
+		total, agents, err := managers.AdminInstance.GetAllShowAgents(c.admin, pageSize, pageIndex, searchParams)
+		if err == nil {
+			if agents == nil {
+				agents = []models.AgentShow{}
+			}
+			c.Data["json"] = c.jsonData(enums.SUCCESS, agents, total)
+		} else {
+			c.Data["json"] = c.jsonData(enums.QUERY_DATA_ERROR)
+			logs.Error(err)
+		}
+		c.ServeJSON()
+	}
 }
 func (c *AdminController) ShowAgentInfo() {
+	c.verify_page(configs.AdminPower["系统"]["代理配置"])
 	id, _ := c.GetInt("id")
 	agent, err := managers.AdminInstance.GetShowAgentInfo(id)
 	if err != nil {

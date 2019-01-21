@@ -219,63 +219,63 @@ type ChatMessages struct {
 
 //配置部分
 type Channel struct {
-	Id                      int    `orm:"column(Id)"`
-	ChannelId               int    `orm:"column(ChannelId)"`               //渠道编号
-	ChannelName             string `orm:"column(ChannelName)"`             //渠道名称
-	MainChannel             string `orm:"column(MainChannel)"`             //主渠道
-	Platform                string `orm:"column(Platform)"`                //平台
-	ServerVersion           int    `orm:"column(ServerVersion)"`           //服务器版本
-	GameShow                bool   `orm:"column(gameshow)"`                //是否在游戏中显示
-	IsTiXianEnabled         bool   `orm:"column(IsTiXianEnabled)"`         //是否启用提现
-	MaxTiXianGold           int    `orm:"column(MaxTiXianGold)"`           //最大提现金额
-	PayUrl                  string `orm:"column(PayUrl)"`                  //充值的Url
-	GameIdentifier          string `orm:"column(GameIdentifier)"`          //不知道
-	IapName                 string `orm:"column(IapName)"`                 //不知道
-	InitMoney               int    `orm:"column(InitMoney)"`               //游客注册赠送金币
-	UpAccountMoney          int    `orm:"column(UpAccountMoney)"`          //升级正式账号赠送金币
-	Remarks                 string `orm:"column(Remarks)"`                 //介绍？
-	IsAgentTiXianEnabled    bool   `orm:"column(IsAgentTiXianEnabled)"`    //代理提现是否启用
-	IsBankCardTiXianEnabled bool   `orm:"column(IsBankCardTiXianEnabled)"` //银行卡提现是否启用
-	IsBankBindingEnabled    bool   `orm:"column(IsBankBindingEnabled)"`    //银行卡绑定是否启用
-	IsUnionPayEnabled       bool   `orm:"column(IsUnionPayEnabled)"`       //银联充值是否启用
-	IsQQPayEnabled          bool   `orm:"column(IsQQPayEnabled)"`          //QQ充值是否开启
-	IsJDPayEnabled          bool   `orm:"column(IsJDPayEnabled)"`          //京东充值是否启用
-	IsWxPayEnabled          bool   `orm:"column(IsWxPayEnabled)"`          //微信充值是否开启
-	IsAlipayEnabled         bool   `orm:"column(IsAlipayEnabled)"`         //支付宝充值是否开启
-	UpdateCount             string `orm:"column(UpdateCount)"`             //更新次数
-	IsDkPayEnabled          bool   `orm:"column(IsDkPayEnabled)"`          //点卡支付是否开启
-	IsAliTixianEnabeld      bool   `orm:"column(IsAliTixianEnabeld)"`      //是否允许支付宝提现
-	IsAliBindingEnabled     bool   `orm:"column(IsAliBindingEnabled)"`     //是否打开支付宝绑定
-	SubPlatformName         string `orm:"column(SubPlatformName)"`         //分平台名称
+	Id                      int    `orm:"column(Id)" json:"id"`
+	ChannelId               int    `orm:"column(ChannelId)" json:"channel_id"`                                 //渠道编号
+	ChannelName             string `orm:"column(ChannelName)" json:"channel_name"`                             //渠道名称
+	MainChannel             string `orm:"column(MainChannel)" json:"main_channel"`                             //主渠道
+	Platform                string `orm:"column(Platform)" json:"platform"`                                    //平台
+	ServerVersion           int    `orm:"column(ServerVersion)" json:"server_version"`                         //服务器版本
+	GameShow                bool   `orm:"column(gameshow)" json:"game_show"`                                   //是否在游戏中显示
+	IsTiXianEnabled         bool   `orm:"column(IsTiXianEnabled)" json:"is_ti_xian_enabled"`                   //是否启用提现
+	MaxTiXianGold           int    `orm:"column(MaxTiXianGold)" json:"max_ti_xian_gold"`                       //最大提现金额
+	PayUrl                  string `orm:"column(PayUrl)" json:"pay_url"`                                       //充值的Url
+	GameIdentifier          string `orm:"column(GameIdentifier)" json:"game_identifier"`                       //不知道
+	IapName                 string `orm:"column(IapName)" json:"iap_name"`                                     //不知道
+	InitMoney               int    `orm:"column(InitMoney)" json:"init_money"`                                 //游客注册赠送金币
+	UpAccountMoney          int    `orm:"column(UpAccountMoney)" json:"up_account_money"`                      //升级正式账号赠送金币
+	Remarks                 string `orm:"column(Remarks)" json:"remarks"`                                      //介绍？
+	IsAgentTiXianEnabled    bool   `orm:"column(IsAgentTiXianEnabled)" json:"is_agent_ti_xian_enabled"`        //代理提现是否启用
+	IsBankCardTiXianEnabled bool   `orm:"column(IsBankCardTiXianEnabled)" json:"is_bank_card_ti_xian_enabled"` //银行卡提现是否启用
+	IsBankBindingEnabled    bool   `orm:"column(IsBankBindingEnabled)" json:"is_bank_binding_enabled"`         //银行卡绑定是否启用
+	IsUnionPayEnabled       bool   `orm:"column(IsUnionPayEnabled)" json:"is_union_pay_enabled"`               //银联充值是否启用
+	IsQQPayEnabled          bool   `orm:"column(IsQQPayEnabled)" json:"is_qq_pay_enabled"`                     //QQ充值是否开启
+	IsJDPayEnabled          bool   `orm:"column(IsJDPayEnabled)" json:"is_jd_pay_enabled"`                     //京东充值是否启用
+	IsWxPayEnabled          bool   `orm:"column(IsWxPayEnabled)" json:"is_wx_pay_enabled"`                     //微信充值是否开启
+	IsAlipayEnabled         bool   `orm:"column(IsAlipayEnabled)" json:"is_alipay_enabled"`                    //支付宝充值是否开启
+	UpdateCount             string `orm:"column(UpdateCount)" json:"update_count"`                             //更新次数
+	IsDkPayEnabled          bool   `orm:"column(IsDkPayEnabled)" json:"is_dk_pay_enabled"`                     //点卡支付是否开启
+	IsAliTixianEnabeld      bool   `orm:"column(IsAliTixianEnabeld)" json:"is_ali_tixian_enabeld"`             //是否允许支付宝提现
+	IsAliBindingEnabled     bool   `orm:"column(IsAliBindingEnabled)" json:"is_ali_binding_enabled"`           //是否打开支付宝绑定
+	SubPlatformName         string `orm:"column(SubPlatformName)" json:"sub_platform_name"`                    //分平台名称
 }
 type AgentShow struct {
-	AgentId          int    `orm:"column(AgentId);pk"`
-	AgentName        string `orm:"column(AgentName)"`        //代理商名称，登陆页面使用
-	Password         string `orm:"column(Password)"`         //登陆密码
-	Payment          string `orm:"column(Payment)"`          //充值密码
-	SignKey          string `orm:"column(SignKey)"`          //加密串密钥
-	Remarks          string `orm:"column(Remarks)"`          //代理商描述，游戏内显示名称
-	QQ               string `orm:"column(QQ)"`               //代理商QQ号码
-	WenXin           string `orm:"column(WenXin)"`           //代理商微信号码
-	Gold             int64  `orm:"column(Gold)"`             //代理商余额,单位分
-	IsUse            bool   `orm:"column(IsUse)"`            //是否可用
-	Level            int    `orm:"column(Level)"`            //等级:1.内部商人、优先级最高;2.集团外商、优先级次等;3.嫡系商人、非集团控制的嫡系合作商人;4.普通商人、市面上合作的商人\\\\n
-	ShowInGame       bool   `orm:"column(ShowInGame)"`       //是否在游戏里显示该代理商
-	MinGold          int64  `orm:"column(MinGold)"`          //保底金额
-	IsMinGoldEnabled bool   `orm:"column(IsMinGoldEnabled)"` //是否启用保底金额
-	UpdateCount      int    `orm:"column(UpdateCount)"`      //更新次数
-	ChannelId        int    `orm:"column(ChannelId)"`        //渠道Id
+	AgentId          int    `orm:"column(AgentId);pk" json:"agent_id"`
+	AgentName        string `orm:"column(AgentName)" json:"agent_name"`                 //代理商名称，登陆页面使用
+	Password         string `orm:"column(Password)" json:"-"`                           //登陆密码
+	Payment          string `orm:"column(Payment)" json:"-"`                            //充值密码
+	SignKey          string `orm:"column(SignKey)" json:"-"`                            //加密串密钥
+	Remarks          string `orm:"column(Remarks)" json:"remarks"`                      //代理商描述，游戏内显示名称
+	QQ               string `orm:"column(QQ)" json:"qq"`                                //代理商QQ号码
+	WenXin           string `orm:"column(WenXin)" json:"wen_xin"`                       //代理商微信号码
+	Gold             int64  `orm:"column(Gold)" json:"gold"`                            //代理商余额,单位分
+	IsUse            bool   `orm:"column(IsUse)" json:"is_use"`                         //是否可用
+	Level            int    `orm:"column(Level)" json:"level"`                          //等级:1.内部商人、优先级最高;2.集团外商、优先级次等;3.嫡系商人、非集团控制的嫡系合作商人;4.普通商人、市面上合作的商人\\\\n
+	ShowInGame       bool   `orm:"column(ShowInGame)" json:"show_in_game"`              //是否在游戏里显示该代理商
+	MinGold          int64  `orm:"column(MinGold)" json:"min_gold"`                     //保底金额
+	IsMinGoldEnabled bool   `orm:"column(IsMinGoldEnabled)" json:"is_min_gold_enabled"` //是否启用保底金额
+	UpdateCount      int    `orm:"column(UpdateCount)" json:"update_count"`             //更新次数
+	ChannelId        int    `orm:"column(ChannelId)" json:"channel_id"`                 //渠道Id
 }
 type Notice struct {
-	Id         int       `orm:"column(Id)"`         //自增长编号//,
-	ChannelId  int       `orm:"column(ChannelId)"`  //渠道编号
-	StartTime  time.Time `orm:"column(StartTime)"`  //开始时间
-	EndTime    time.Time `orm:"column(EndTime)"`    //结束时间
-	Content    string    `orm:"column(Content)"`    //内容
-	Title      string    `orm:"column(Title)"`      //标题
-	CreateTime time.Time `orm:"column(CreateTime)"` //创建时间
-	IsActive   bool      `orm:"column(IsActive)"`   //是否启用
-	Url        string    `orm:"column(Url)"`        //官网Url
+	Id         int       `orm:"column(Id)" json:"id"`                  //自增长编号//,
+	ChannelId  int       `orm:"column(ChannelId)" json:"channel_id"`   //渠道编号
+	StartTime  time.Time `orm:"column(StartTime)" json:"start_time"`   //开始时间
+	EndTime    time.Time `orm:"column(EndTime)" json:"end_time"`       //结束时间
+	Content    string    `orm:"column(Content)" json:"content"`        //内容
+	Title      string    `orm:"column(Title)" json:"title"`            //标题
+	CreateTime time.Time `orm:"column(CreateTime)" json:"create_time"` //创建时间
+	IsActive   bool      `orm:"column(IsActive)" json:"is_active"`     //是否启用
+	Url        string    `orm:"column(Url)" json:"url"`                //官网Url
 }
 
 func (this *AgentApply) TableName() string {
