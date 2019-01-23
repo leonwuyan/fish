@@ -15,6 +15,8 @@ var PaymentGate, _ = beego.AppConfig.GetSection("payment")
 var AdminPower map[string]map[string]int
 var TaskEnabled, _ = beego.AppConfig.Bool("task_enabled")
 var GameServer, _ = beego.AppConfig.GetSection("game_server")
+var PayAmountFloor, _ = beego.AppConfig.Bool("pay_amount_floor")
+var DownUrls []string
 
 func loadPermissions() {
 	data, err := ioutil.ReadFile("conf/admin.json")
@@ -26,6 +28,17 @@ func loadPermissions() {
 		return
 	}
 }
+func loadDownloadUrls() {
+	data, err := ioutil.ReadFile("conf/download.json")
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(data, &DownUrls)
+	if err != nil {
+		return
+	}
+}
 func init() {
 	loadPermissions()
+	loadDownloadUrls()
 }

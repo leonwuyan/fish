@@ -2,12 +2,14 @@ package controllers
 
 import (
 	"bytes"
+	"encoding/json"
 	"fish/configs"
 	"fish/enums"
 	"fish/managers"
 	"fish/payment"
 	"fish/payment/hongjia"
 	"fish/payment/huiyi"
+	"fish/payment/sunapi"
 	"fish/payment/wohuibao"
 	"fish/payment/yijia"
 	"fish/payment/zongheng"
@@ -18,6 +20,7 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
+	"io/ioutil"
 	"math"
 	"os"
 	"strconv"
@@ -56,7 +59,9 @@ func (c *MainController) Recharge() {
 	channel, _ := c.GetInt("channel")
 	amount, _ := c.GetFloat("pay_amt")
 	pay_type, _ := c.GetInt("pay_type")
-	amount = math.Floor(amount)
+	if configs.PayAmountFloor {
+		amount = math.Floor(amount)
+	}
 	var PaymentAction map[enums.PaymentChannel]func(userId, channel, pay_type int, amount float64)
 	PaymentAction = make(map[enums.PaymentChannel]func(userId, channel, pay_type int, amount float64))
 	PaymentAction[enums.PAY_CHANNEL_HUIYI] = c.RechargeHuiYi
@@ -64,6 +69,7 @@ func (c *MainController) Recharge() {
 	PaymentAction[enums.PAY_CHANNEL_HONGJIA] = c.RechargeHongJia
 	PaymentAction[enums.PAY_CHANNEL_ZONGHENG] = c.RechargeZongHeng
 	PaymentAction[enums.PAY_CHANNEL_YIJIA] = c.RechargeYiJia
+	PaymentAction[enums.PAY_CHANNEL_SUNAPI] = c.RechargeSunApi
 	var configChannel enums.PaymentChannel
 	switch pay_type {
 	//支付宝
@@ -178,7 +184,32 @@ func (c *MainController) RechargeYiJia(userId, channel, pay_type int, amount flo
 		c.Abort("10002")
 		break
 	case 105:
-		c.Data["html"] = yijia.PostPay(amount, yiJiaType(pay_type), pay_order, configs.Domain["domain"]+"notify/yi_jia")
+		c.Data["html"] = yijia.PostPay(amount, yiJiaType(pay_type), pay_order, configs.Domain["domain"]+"notify/sun_api")
+		break
+	}
+}
+func (c *MainController) RechargeSunApi(userId, channel, pay_type int, amount float64) {
+	pay_order := payment.Create_order()
+	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
+	if err != nil {
+		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
+		c.Abort("10001")
+	}
+	//var action interface{}
+	switch channel {
+	default:
+		c.Abort("10002")
+		break
+	case 105:
+		result, err := sunapi.GetPayUrl(strconv.FormatFloat(amount, 'f', 2, 64), sunApiType(pay_type), pay_order, configs.Domain["domain"]+"notify/sun_api")
+		if err != nil {
+			c.Ctx.WriteString(fmt.Sprintf("发生错误：%s", err.Error()))
+		}
+		if result.Code == "10000" {
+			c.Redirect(result.Result, 302)
+		} else {
+			c.Ctx.WriteString(result.Msg)
+		}
 		break
 	}
 }
@@ -278,6 +309,22 @@ func (c *MainController) Notify_Yi_Jia() {
 		} else {
 			result = "OK"
 		}
+	}
+	c.Ctx.WriteString(result)
+}
+func (c *MainController) Notify_Sun_Api() {
+	jsonData, _ := ioutil.ReadAll(c.Ctx.Request.Body)
+	params := make(map[string]string)
+	err := json.Unmarshal(jsonData, &params)
+	if err != nil {
+		logs.Error(err)
+		c.Ctx.WriteString("json parse fail")
+		return
+	}
+	logs.Info(params)
+	result := sunapi.Notify(params)
+	if result == "success" {
+		managers.SystemInstance.FinishRecharge(params["outTradeNo"])
 	}
 	c.Ctx.WriteString(result)
 }
@@ -409,6 +456,18 @@ func yiJiaType(payType int) yijia.PayType {
 		//	return yijia.PAY_TYPE_BANK
 	default:
 		return yijia.PAY_TYPE_ALIPAY
+	}
+}
+func sunApiType(payType int) sunapi.PayType {
+	switch payType {
+	case 22:
+		return sunapi.PAY_TYPE_ALIPAY
+	case 30:
+		return sunapi.PAY_TYPE_WECHAT
+		//case 23:
+		//	return yijia.PAY_TYPE_BANK
+	default:
+		return sunapi.PAY_TYPE_ALIPAY
 	}
 }
 

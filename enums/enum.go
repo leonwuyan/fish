@@ -124,6 +124,7 @@ const (
 	PAY_CHANNEL_ZONGHENG PaymentChannel = 4
 	PAY_CHANNEL_YIJIA    PaymentChannel = 5
 	PAY_CHANNEL_ALIPAY   PaymentChannel = 6
+	PAY_CHANNEL_SUNAPI   PaymentChannel = 7
 )
 
 type GoldChangeType int

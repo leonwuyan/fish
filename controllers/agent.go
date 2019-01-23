@@ -13,6 +13,7 @@ import (
 	"image"
 	"image/draw"
 	"image/jpeg"
+	"math/rand"
 	"os"
 	"reflect"
 	"strconv"
@@ -101,12 +102,12 @@ func (c *AgentController) ChangePwd() {
 	}
 }
 func (c *AgentController) Generalize() {
-	adUrl := configs.Domain["domain"] + "advertise?agentId=" + strconv.Itoa(c.agent.Id)
+	adUrl := c.getDownUrl() + "?id=" + strconv.Itoa(c.agent.Id)
 	c.Data["ad_url"] = adUrl
 }
 func (c *AgentController) GeneralizeQr() {
 	templateId := c.Ctx.Input.Param(":id")
-	adUrl := configs.Domain["domain"] + "advertise?agentId=" + strconv.Itoa(c.agent.Id)
+	adUrl := c.getDownUrl() + "?id=" + strconv.Itoa(c.agent.Id)
 	img, _ := c.createQr(fmt.Sprintf("static/img/bg%s.png", templateId), adUrl)
 	c.Ctx.Output.ContentType("png")
 	var b bytes.Buffer
@@ -319,4 +320,8 @@ func (c *AgentController) createQr(bgPath, info string) (newImg draw.Image, err 
 	draw.Draw(newImg, qrImg.Bounds().Add(qrImg_offset), qrImg, qrImg.Bounds().Min, draw.Src)
 	draw.Draw(newImg, qrImg.Bounds().Add(logoImg_offset), logoImg, logoImg.Bounds().Min, draw.Src)
 	return
+}
+func (c AgentController) getDownUrl() string {
+	index := rand.Intn(len(configs.DownUrls))
+	return configs.DownUrls[index]
 }

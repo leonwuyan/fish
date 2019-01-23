@@ -21,6 +21,7 @@ func init() {
 	beego.Router("/notify/hong_jia", &controllers.MainController{}, "*:Notify_Hong_Jia")
 	beego.Router("/notify/zong_heng", &controllers.MainController{}, "*:Notify_Zong_Heng")
 	beego.Router("/notify/yi_jia", &controllers.MainController{}, "*:Notify_Yi_Jia")
+	beego.Router("/notify/sun_api", &controllers.MainController{}, "*:Notify_Sun_Api")
 	ns_admin := beego.NewNamespace("/admin",
 		beego.NSRouter("/", &controllers.AdminController{}, "*:Index"),
 		beego.NSRouter("/login", &controllers.AdminController{}, "*:Login"),
