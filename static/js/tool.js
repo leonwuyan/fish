@@ -121,14 +121,14 @@ const tool = {
                     </div>
                     <div class="wh_float">
                         <div style="width:100%;height: 7%;z-index:1000;"></div>
-                        <div style="width:100%;height: 93%;z-index:1000;"><img style="width:100%;height: 100%;" src="https://github.com/freegame1010403936/freegame/raw/master/wh_main.png"></div>
+                        <div style="width:100%;height: 93%;z-index:1000;"><img style="width:100%;height: 100%;" src="https://gitee.com/freegame1010403936/fish/raw/master/img/tool/wh_main.png"></div>
                     </div>
                     <div class="wh_float2">
-                        <div style="width:100%;height: 6%;z-index:1000;"><img style="height: 100%;margin-left:15%;margin-top: 1.3%;width:70%;float: left" src="https://github.com/freegame1010403936/freegame/raw/master/wh_detail.png">
-                            <img style="height: 75%;width:7%;margin-left:1.2%;margin-top: 2.2%;float: left;z-index:1000;" src="https://github.com/freegame1010403936/freegame/raw/master/wh_close.png" alt="关闭" onclick="javascript:tool.closeHtml();">
+                        <div style="width:100%;height: 6%;z-index:1000;"><img style="height: 100%;margin-left:15%;margin-top: 1.3%;width:70%;float: left" src="https://gitee.com/freegame1010403936/fish/raw/master/img/tool/wh_detail.png">
+                            <img style="height: 75%;width:7%;margin-left:1.2%;margin-top: 2.2%;float: left;z-index:1000;" src="https://gitee.com/freegame1010403936/fish/raw/master/img/tool/wh_close.png" alt="关闭" onclick="javascript:tool.closeHtml();">
                         </div>
                         <div style="width: 100%;height: 73%;z-index:1000;"></div>
-                        <div style="width: 100%;height: 20%;text-align: center;vertical-align: middle;z-index:1000;"><img style="margin-top:6%;height:60%;width:5.4%;z-index:1000;" src="https://github.com/freegame1010403936/freegame/raw/master/wh_output.gif"/></div>
+                        <div style="width: 100%;height: 20%;text-align: center;vertical-align: middle;z-index:1000;"><img style="margin-top:6%;height:60%;width:5.4%;z-index:1000;" src="https://gitee.com/freegame1010403936/fish/raw/master/img/tool/wh_output.gif"/></div>
                     </div>
                 </div>`;
         document.getElementsByTagName('body')[0].innerHTML = createView + document.getElementsByTagName('body')[0].innerHTML;
@@ -169,10 +169,10 @@ const tool = {
     createWeiXinDOM: function() {
         let createView = `
                 <div class="weixin" name="wbllq" style="display:none;z-index:1000;position:fixed;top:0;right:0;bottom:0;left:0;text-align:center;background:rgba(0,0,0,.8);">
-                    <img src="https://github.com/freegame1010403936/freegame/raw/master/weixinTip.png" alt="" style="margin:.3rem 0 0 .4rem;width:90%;height:auto;margin: .3rem 0 0 .4rem;">
+                    <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/tool/weixinTip.png" alt="" style="margin:.3rem 0 0 .4rem;width:90%;height:auto;margin: .3rem 0 0 .4rem;">
                 </div>
                 <div class="weixin" name="wbllq" style="display:none;z-index:1000;position:fixed;top:0;right:0;bottom:0;left:0;text-align:center;background:rgba(0,0,0,.8);">
-                    <img src="https://github.com/freegame1010403936/freegame/raw/master/weixinTip2.png" alt="" style="margin:.3rem 0 0 .4rem;width:90%;height:auto;margin: .3rem 0 0 .4rem;">
+                    <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/tool/weixinTip2.png" alt="" style="margin:.3rem 0 0 .4rem;width:90%;height:auto;margin: .3rem 0 0 .4rem;">
                 </div>`;
         document.getElementsByTagName('body')[0].innerHTML += createView;
     },

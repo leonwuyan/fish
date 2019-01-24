@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>自由娱乐-下载</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://cdn.bootcss.com/clipboard.js/1.5.12/clipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.3/js/swiper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/4.3.3/css/swiper.min.css">
+    <script>
+        adaptation(750);
+
+        function adaptation(size) {
+            if (document.documentElement.clientWidth > size) {
+                document.documentElement.style.fontSize = size / 7.5 + "px"
+            } else {
+                document.documentElement.style.fontSize = document.documentElement.clientWidth / 7.5 + "px"
+            }
+        }
+
+        window.onresize = function () {
+            adaptation(750)
+        };
+    </script>
+    <style>
+        html,body {line-height:1.5;}
+        body {background:#121633;}
+        body::-webkit-scrollbar{display: none}
+        body,h1,h2,h3,h4,h5,h6,ul,ol,dl,dd,p {margin:0;}
+        body,h1,input,button,select,textarea {font-family:"Microsoft Yahei","PingFang SC","Helvetica Neue",serif;font-size:.28rem;color:#1a1a1a;}
+        input,button,select,textarea {border:none;outline:none;}
+        input,button,textarea,th,td {padding:0;}
+        i,em,cite {font-style:normal;}
+        ul,ol {padding:0;list-style:none;}
+        img {vertical-align:top;border:none;}
+        a {text-decoration:none;color:inherit;}
+
+        .warp,.header,.step,.footer{margin:0 auto;width:7.5rem;}
+        .warp:after{content:'';display:table;clear:both;}
+
+        .header{position:fixed;display:table;background:rgba(0,0,0,.6);z-index:3;}
+        .game-logo,.game-name,.game-down{display:table-cell;height:1.5rem;vertical-align:middle;}
+        .game-logo{width:1.27rem;text-align:right;}
+        .game-logo img{border-radius:.2rem;width:1rem;height:1rem;}
+        .game-name{padding:0 .17rem;font-size:.24rem;font-weight:300;color:#fff;}
+        .game-name p:first-child{font-size:.36rem;font-weight:bold;}
+        .game-down{width:2.17rem;}
+        .game-down img{width:1.8rem;height:.7rem;}
+        .game-cont img{width:100%;}
+        .game-down-2{position:relative;height:7.4rem;background:url("https://gitee.com/freegame1010403936/fish/raw/master/img/img-01.jpg") no-repeat top / contain;}
+        .game-down-2 img{position:absolute;bottom:0.3rem;left:50%;transform:translate(-50%);width:3.45rem}
+        .game-num{height:3.3rem;background:url("https://gitee.com/freegame1010403936/fish/raw/master/img/img-02.jpg") no-repeat top / contain;}
+        .game-num li{float:left;margin:1.8rem .4rem 0 0;width:1.28rem;height:1.28rem;}
+        .game-num li:first-child{margin:1.8rem .4rem 0;}
+
+        .step{background:url("https://gitee.com/freegame1010403936/fish/raw/master/img/step-header.jpg") no-repeat top / contain;text-align:center;}
+        .step-header{padding:.5rem 0;font-size:.36rem;color:#fff;}
+        .step img{margin-bottom:.3rem;width:6.9rem;}
+
+        .weixin{position:fixed;top:0;right:0;bottom:0;left:0;text-align:center;background:rgba(0,0,0,.8);z-index:9;}
+        .weixin img{margin:.3rem 0 0 .4rem;width:5.73rem;height:2.65rem;}
+    </style>
+</head>
+<body>
+<div class="warp">
+    <a href="#">
+        <div class="header">
+            <div class="game-logo">
+                <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/logo.png" alt="自由娱乐">
+            </div>
+            <div class="game-name">
+                <p>自由娱乐</p>
+                <p>火爆全球超刺激的棋牌游戏</p>
+            </div>
+            <div class="game-down">
+                <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/game-down.png" alt="" class="gameDown">
+            </div>
+        </div>
+    </a>
+    <div class="game-cont">
+        <div class="game-down-2">
+            <a href="#">
+                <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/game-down-2.png" alt="" class="gameDown">
+            </a>
+        </div>
+        <div class="game-num swiper-container">
+            <ul class="swiper-wrapper">1.png
+                <li class="swiper-slide"><img src="https://gitee.com/freegame1010403936/fish/raw/master/img/1.png" alt="捕鱼"></li>
+                <li class="swiper-slide"><img src="https://gitee.com/freegame1010403936/fish/raw/master/img/2.png" alt="斗地主"></li>
+                <li class="swiper-slide"><img src="https://gitee.com/freegame1010403936/fish/raw/master/img/3.png" alt="炸金花"></li>
+                <li class="swiper-slide"><img src="https://gitee.com/freegame1010403936/fish/raw/master/img/4.png" alt="金典牛牛"></li>
+                <li class="swiper-slide"><img src="https://gitee.com/freegame1010403936/fish/raw/master/img/5.png" alt="红黑大战"></li>
+                <li class="swiper-slide"><img src="https://gitee.com/freegame1010403936/fish/raw/master/img/6.png" alt="龙虎斗"></li>
+                <li class="swiper-slide"><img src="https://gitee.com/freegame1010403936/fish/raw/master/img/7.png" alt="百人牛牛"></li>
+            </ul>
+        </div>
+        <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/img-03.jpg" alt="">
+        <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/img-04.jpg" alt="">
+        <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/img-05.jpg" alt="">
+        <img src="https://gitee.com/freegame1010403936/fish/raw/master/img/img-06.jpg" alt="">
+    </div>
+</div>
+<script src="https://freegame1010403936.github.io/freegame/tool.js"></script>
+<script>
+    function request(name) {
+        reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+    var swiper = new Swiper('.swiper-container', {
+        slidesPerView: 'auto',
+        freeMode: true
+    });
+    var clip = new Clipboard('a', {
+        text: function () {
+            return '###' + request("id")
+        }
+    });
+</script>
+</body>
+</html>
