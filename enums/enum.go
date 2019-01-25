@@ -118,6 +118,7 @@ const (
 type PaymentChannel int
 
 const (
+	PAY_CHANNEL_SYSTEM   PaymentChannel = 0
 	PAY_CHANNEL_HUIYI    PaymentChannel = 1
 	PAY_CHANNEL_WOHUIBAO PaymentChannel = 2
 	PAY_CHANNEL_HONGJIA  PaymentChannel = 3

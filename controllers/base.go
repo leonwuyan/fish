@@ -8,8 +8,14 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/cache"
 	"github.com/astaxie/beego/utils/captcha"
+	"github.com/nfnt/resize"
+	"github.com/skip2/go-qrcode"
 	"html/template"
+	"image"
+	"image/draw"
+	"image/png"
 	"math/rand"
+	"os"
 	"reflect"
 	"sort"
 	"strconv"
@@ -71,7 +77,6 @@ func verifyPower(admin models.AdminAccount, code int) bool {
 	}
 	return false
 }
-
 func createPostForm(c *baseController, items []map[string]interface{}) {
 	htmlFormatter := "<div class=\"form-group input-group\"><span class=\"input-group-addon\">%s</span>%s</div>"
 	inputFormatter := "<input class=\"form-control\" type=\"%s\" name=\"%s\" value=\"%s\" placeholder=\"%s\" %s %s/>"
@@ -182,5 +187,42 @@ func createPostForm(c *baseController, items []map[string]interface{}) {
 		}
 	}
 	c.Data["form"] = html
+	return
+}
+func getDownUrl() string {
+	index := rand.Intn(len(configs.DownUrls))
+	return configs.DownUrls[index]
+}
+func createQr(bgPath, info string) (newImg draw.Image, err error) {
+	bgFile, err := os.Open(bgPath)
+	defer bgFile.Close()
+	if err != nil {
+		return
+	}
+	logoFile, err := os.Open("static/img/logo.png")
+	defer logoFile.Close()
+	if err != nil {
+		return
+	}
+	bgImg, err := png.Decode(bgFile)
+	if err != nil {
+		return
+	}
+	logoImg, err := png.Decode(logoFile)
+	if err != nil {
+		return
+	}
+
+	qrCode, _ := qrcode.New(info, qrcode.Highest)
+	qrImg := qrCode.Image(235)
+	logoImgSize := qrImg.Bounds().Max.X / 4
+	logoImg = resize.Thumbnail(uint(logoImgSize), uint(logoImgSize), logoImg, resize.Lanczos3)
+	newImg = image.NewRGBA64(bgImg.Bounds())
+	global_offset_Y := 657
+	qrImg_offset := image.Pt(bgImg.Bounds().Max.X/2-qrImg.Bounds().Max.X/2, global_offset_Y-qrImg.Bounds().Max.Y/2)
+	logoImg_offset := qrImg_offset.Add(image.Pt(qrImg.Bounds().Max.X/2-logoImg.Bounds().Max.X/2, qrImg.Bounds().Max.Y/2-logoImg.Bounds().Max.Y/2))
+	draw.Draw(newImg, bgImg.Bounds(), bgImg, bgImg.Bounds().Min, draw.Over)
+	draw.Draw(newImg, qrImg.Bounds().Add(qrImg_offset), qrImg, qrImg.Bounds().Min, draw.Src)
+	draw.Draw(newImg, qrImg.Bounds().Add(logoImg_offset), logoImg, logoImg.Bounds().Min, draw.Src)
 	return
 }

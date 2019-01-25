@@ -228,7 +228,7 @@ func (this *AdminMgr) RechargePlayer(id int, amount float64, rechargeType int) e
 		return enums.PLAYER_NOT_FOUND
 	}
 	payOrder := payment.Create_order()
-	SystemInstance.PreRecharge(id, 105, rechargeType, int(amount*100), payOrder)
+	SystemInstance.PreRecharge(enums.PAY_CHANNEL_SYSTEM, id, 105, rechargeType, int(amount*100), payOrder)
 	SystemInstance.FinishRecharge(payOrder)
 	return enums.SUCCESS
 }

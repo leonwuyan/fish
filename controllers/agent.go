@@ -1,20 +1,11 @@
 package controllers
 
 import (
-	"bytes"
 	"fish/configs"
 	"fish/enums"
 	"fish/managers"
 	"fish/models"
-	"fmt"
 	"github.com/astaxie/beego/logs"
-	"github.com/nfnt/resize"
-	"github.com/skip2/go-qrcode"
-	"image"
-	"image/draw"
-	"image/jpeg"
-	"math/rand"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -102,17 +93,8 @@ func (c *AgentController) ChangePwd() {
 	}
 }
 func (c *AgentController) Generalize() {
-	adUrl := c.getDownUrl() + "?id=" + strconv.Itoa(c.agent.Id)
+	adUrl := getDownUrl() + "?id=" + strconv.Itoa(c.agent.Id)
 	c.Data["ad_url"] = adUrl
-}
-func (c *AgentController) GeneralizeQr() {
-	templateId := c.Ctx.Input.Param(":id")
-	adUrl := c.getDownUrl() + "?id=" + strconv.Itoa(c.agent.Id)
-	img, _ := c.createQr(fmt.Sprintf("static/img/bg%s.png", templateId), adUrl)
-	c.Ctx.Output.ContentType("png")
-	var b bytes.Buffer
-	jpeg.Encode(&b, img, &jpeg.Options{Quality: 75})
-	c.Ctx.Output.Body(b.Bytes())
 }
 func (c *AgentController) Agents() {
 	if c.Ctx.Input.IsPost() {
@@ -292,36 +274,4 @@ func (c *AgentController) checkSession() bool {
 		}
 	}
 	return false
-}
-
-func (c *AgentController) createQr(bgPath, info string) (newImg draw.Image, err error) {
-	bgFile, err := os.Open(bgPath)
-	defer bgFile.Close()
-	if err != nil {
-		return
-	}
-	logoFile, err := os.Open("static/img/logo.png")
-	defer logoFile.Close()
-	if err != nil {
-		return
-	}
-	bgImg, _ := jpeg.Decode(bgFile)
-	logoImg, _ := jpeg.Decode(logoFile)
-
-	qrCode, _ := qrcode.New(info, qrcode.Highest)
-	qrImg := qrCode.Image(232)
-	logoImgSize := qrImg.Bounds().Max.X / 4
-	logoImg = resize.Thumbnail(uint(logoImgSize), uint(logoImgSize), logoImg, resize.Lanczos3)
-	newImg = image.NewRGBA64(bgImg.Bounds())
-	global_offset_Y := 657
-	qrImg_offset := image.Pt(bgImg.Bounds().Max.X/2-qrImg.Bounds().Max.X/2, global_offset_Y-qrImg.Bounds().Max.Y/2)
-	logoImg_offset := qrImg_offset.Add(image.Pt(qrImg.Bounds().Max.X/2-logoImg.Bounds().Max.X/2, qrImg.Bounds().Max.Y/2-logoImg.Bounds().Max.Y/2))
-	draw.Draw(newImg, bgImg.Bounds(), bgImg, bgImg.Bounds().Min, draw.Over)
-	draw.Draw(newImg, qrImg.Bounds().Add(qrImg_offset), qrImg, qrImg.Bounds().Min, draw.Src)
-	draw.Draw(newImg, qrImg.Bounds().Add(logoImg_offset), logoImg, logoImg.Bounds().Min, draw.Src)
-	return
-}
-func (c AgentController) getDownUrl() string {
-	index := rand.Intn(len(configs.DownUrls))
-	return configs.DownUrls[index]
 }

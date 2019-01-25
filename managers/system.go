@@ -3,6 +3,7 @@ package managers
 import (
 	"fish/alisms"
 	"fish/configs"
+	"fish/enums"
 	"fish/models"
 	"fmt"
 	"github.com/astaxie/beego"
@@ -22,7 +23,7 @@ func newSystem() *SystemMgr {
 func (this *SystemMgr) Recharge() {
 
 }
-func (this *SystemMgr) PreRecharge(userId, channel, payType, amount int, payOrder string) (err error) {
+func (this *SystemMgr) PreRecharge(payChannel enums.PaymentChannel, userId, channel, payType, amount int, payOrder string) (err error) {
 	o := orm.NewOrm()
 	player, err := PlayerInstance.GetPlayerById(userId)
 	if err != nil {
@@ -31,6 +32,7 @@ func (this *SystemMgr) PreRecharge(userId, channel, payType, amount int, payOrde
 	rechargeData := models.RechargeLog{
 		UserId:          userId,
 		RechargeChannel: channel,
+		ChannelType:     int(payChannel),
 		RechargeType:    payType,
 		TransactionId:   payOrder,
 		GoldChange:      int64(amount),
@@ -41,7 +43,7 @@ func (this *SystemMgr) PreRecharge(userId, channel, payType, amount int, payOrde
 	}
 	_, err = o.Insert(&rechargeData)
 	if err != nil {
-		this.PreRecharge(userId, channel, payType, amount, payOrder)
+		this.PreRecharge(payChannel, userId, channel, payType, amount, payOrder)
 	}
 	return
 }

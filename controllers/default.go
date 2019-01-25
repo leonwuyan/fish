@@ -15,14 +15,9 @@ import (
 	"fish/payment/zongheng"
 	"fmt"
 	"github.com/astaxie/beego/logs"
-	"github.com/nfnt/resize"
-	"github.com/skip2/go-qrcode"
-	"image"
-	"image/draw"
-	"image/png"
+	"image/jpeg"
 	"io/ioutil"
 	"math"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -58,20 +53,19 @@ func (c *MainController) Recharge() {
 	userId, _ := c.GetInt("userId")
 	channel, _ := c.GetInt("channel")
 	amount, _ := c.GetFloat("pay_amt")
-	pay_type, _ := c.GetInt("pay_type")
+	payType, _ := c.GetInt("pay_type")
 	if configs.PayAmountFloor {
 		amount = math.Floor(amount)
 	}
-	var PaymentAction map[enums.PaymentChannel]func(userId, channel, pay_type int, amount float64)
-	PaymentAction = make(map[enums.PaymentChannel]func(userId, channel, pay_type int, amount float64))
-	PaymentAction[enums.PAY_CHANNEL_HUIYI] = c.RechargeHuiYi
-	PaymentAction[enums.PAY_CHANNEL_WOHUIBAO] = c.RechargeWoHuiBao
-	PaymentAction[enums.PAY_CHANNEL_HONGJIA] = c.RechargeHongJia
-	PaymentAction[enums.PAY_CHANNEL_ZONGHENG] = c.RechargeZongHeng
-	PaymentAction[enums.PAY_CHANNEL_YIJIA] = c.RechargeYiJia
-	PaymentAction[enums.PAY_CHANNEL_SUNAPI] = c.RechargeSunApi
+	//PaymentAction := make(map[enums.PaymentChannel]func(userId, channel, pay_type int, amount float64))
+	//PaymentAction[enums.PAY_CHANNEL_HUIYI] = c.Recharge_Hui_Yi
+	//PaymentAction[enums.PAY_CHANNEL_WOHUIBAO] = c.Recharge_Wo_Hui_Bao
+	//PaymentAction[enums.PAY_CHANNEL_HONGJIA] = c.Recharge_Hong_Jia
+	//PaymentAction[enums.PAY_CHANNEL_ZONGHENG] = c.Recharge_Zong_Heng
+	//PaymentAction[enums.PAY_CHANNEL_YIJIA] = c.Recharge_Yi_Jia
+	//PaymentAction[enums.PAY_CHANNEL_SUNAPI] = c.Recharge_Sun_Api
 	var configChannel enums.PaymentChannel
-	switch pay_type {
+	switch payType {
 	//支付宝
 	case 22:
 		i_channel, _ := strconv.Atoi(configs.PaymentGate["alipay"])
@@ -86,122 +80,103 @@ func (c *MainController) Recharge() {
 		i_channel, _ := strconv.Atoi(configs.PaymentGate["wechat"])
 		configChannel = enums.PaymentChannel(i_channel)
 	}
-	PaymentAction[configChannel](userId, channel, pay_type, amount)
+	c.RechargeHandler(configChannel, userId, channel, payType, amount)
+	//PaymentAction[configChannel](userId, channel, pay_type, amount)
 }
-func (c *MainController) RechargeHuiYi(userId, channel, pay_type int, amount float64) {
-	//userId=167&channel=1&pay_type=22&pay_amt=68.14&deviceid=5878a7ab84fb43402106c575658472fa
+func (c *MainController) RechargeHandler(payChannel enums.PaymentChannel, userId, channel, payType int, amount float64) {
+	pay_order := payment.Create_order()
+	err := managers.SystemInstance.PreRecharge(payChannel, userId, channel, payType, int(amount*100), pay_order)
+	if err != nil {
+		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
+		c.Abort("10001")
+	}
+	switch payChannel {
+	case enums.PAY_CHANNEL_HUIYI:
+		c.Recharge_Hui_Yi(userId, channel, payType, amount, pay_order)
+		break
+	case enums.PAY_CHANNEL_WOHUIBAO:
+		c.Recharge_Wo_Hui_Bao(userId, channel, payType, amount, pay_order)
+		break
+	case enums.PAY_CHANNEL_HONGJIA:
+		c.Recharge_Hong_Jia(userId, channel, payType, amount, pay_order)
+		break
+	case enums.PAY_CHANNEL_ZONGHENG:
+		c.Recharge_Zong_Heng(userId, channel, payType, amount, pay_order)
+		break
+	case enums.PAY_CHANNEL_YIJIA:
+		c.Recharge_Yi_Jia(userId, channel, payType, amount, pay_order)
+		break
+	case enums.PAY_CHANNEL_ALIPAY:
+		//c.Recharge_Hui_Yi(userId, channel, payType, amount, pay_order)
+		break
+	case enums.PAY_CHANNEL_SUNAPI:
+		c.Recharge_Sun_Api(userId, channel, payType, amount, pay_order)
+		break
+	}
+}
+func (c *MainController) Recharge_Hui_Yi(userId, channel, payType int, amount float64, payOrder string) {
 	c.TplName = "payPost.tpl"
-	//userId, _ := c.GetInt("userId")
-	//channel, _ := c.GetInt("channel")
-	//amount, _ := c.GetFloat("pay_amt")
-	//pay_type, _ := c.GetInt("pay_type")
-	//deviceid := c.GetString("deviceid")
-	pay_order := payment.Create_order()
-	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
-	if err != nil {
-		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
-		c.Abort("10001")
-	}
-	//var action interface{}
 	switch channel {
 	default:
 		c.Abort("10002")
 		break
 	case 105:
-		c.Data["html"] = huiyi.PostPay(int(amount*100), huiYiType(pay_type), pay_order, configs.Domain["domain"]+"notify/hui_yi")
+		c.Data["html"] = huiyi.PostPay(int(amount*100), huiYiType(payType), payOrder, configs.Domain["domain"]+"notify/hui_yi")
 		break
 	}
 }
-func (c *MainController) RechargeWoHuiBao(userId, channel, pay_type int, amount float64) {
-	//userId, _ := c.GetInt("userId")
-	//channel, _ := c.GetInt("channel")
-	//amount, _ := c.GetFloat("pay_amt")
-	//pay_type, _ := c.GetInt("pay_type")
-	pay_order := payment.Create_order()
-	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
-	if err != nil {
-		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
-		c.Abort("10001")
-	}
+func (c *MainController) Recharge_Wo_Hui_Bao(userId, channel, payType int, amount float64, payOrder string) {
 	switch channel {
 	default:
 		c.Abort("10002")
 		break
 	case 105:
-		url := wohuibao.GetApiUrl(strconv.FormatFloat(amount, 'f', 2, 64), woHuiBaoType(pay_type), pay_order, configs.Domain["domain"]+"notify/wo_hui_bao")
+		url := wohuibao.GetApiUrl(strconv.FormatFloat(amount, 'f', 2, 64), woHuiBaoType(payType), payOrder, configs.Domain["domain"]+"notify/wo_hui_bao")
+		c.Redirect(url, 302)
+		break
+	}
+}
+func (c *MainController) Recharge_Hong_Jia(userId, channel, payType int, amount float64, payOrder string) {
+	switch channel {
+	default:
+		c.Abort("10002")
+		break
+	case 105:
+		url := hongjia.GetApiUrl(strconv.FormatFloat(amount, 'f', 2, 64), hongJiaType(payType), payOrder, configs.Domain["domain"]+"notify/hong_jia")
 		//println(url)
 		c.Redirect(url, 302)
 		break
 	}
 }
-func (c *MainController) RechargeHongJia(userId, channel, pay_type int, amount float64) {
-	pay_order := payment.Create_order()
-	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
-	if err != nil {
-		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
-		c.Abort("10001")
-	}
+func (c *MainController) Recharge_Zong_Heng(userId, channel, payType int, amount float64, payOrder string) {
 	switch channel {
 	default:
 		c.Abort("10002")
 		break
 	case 105:
-		url := hongjia.GetApiUrl(strconv.FormatFloat(amount, 'f', 2, 64), hongJiaType(pay_type), pay_order, configs.Domain["domain"]+"notify/hong_jia")
+		url := zongheng.GetApiUrl(strconv.FormatFloat(amount, 'f', 2, 64), zongHengType(payType), payOrder, configs.Domain["domain"]+"notify/zong_heng")
 		//println(url)
 		c.Redirect(url, 302)
 		break
 	}
 }
-func (c *MainController) RechargeZongHeng(userId, channel, pay_type int, amount float64) {
-	pay_order := payment.Create_order()
-	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
-	if err != nil {
-		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
-		c.Abort("10001")
-	}
+func (c *MainController) Recharge_Yi_Jia(userId, channel, payType int, amount float64, payOrder string) {
 	switch channel {
 	default:
 		c.Abort("10002")
 		break
 	case 105:
-		url := zongheng.GetApiUrl(strconv.FormatFloat(amount, 'f', 2, 64), zongHengType(pay_type), pay_order, configs.Domain["domain"]+"notify/zong_heng")
-		//println(url)
-		c.Redirect(url, 302)
+		c.Data["html"] = yijia.PostPay(amount, yiJiaType(payType), payOrder, configs.Domain["domain"]+"notify/sun_api")
 		break
 	}
 }
-func (c *MainController) RechargeYiJia(userId, channel, pay_type int, amount float64) {
-	c.TplName = "payPost.tpl"
-	pay_order := payment.Create_order()
-	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
-	if err != nil {
-		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
-		c.Abort("10001")
-	}
-	//var action interface{}
+func (c *MainController) Recharge_Sun_Api(userId, channel, payType int, amount float64, payOrder string) {
 	switch channel {
 	default:
 		c.Abort("10002")
 		break
 	case 105:
-		c.Data["html"] = yijia.PostPay(amount, yiJiaType(pay_type), pay_order, configs.Domain["domain"]+"notify/sun_api")
-		break
-	}
-}
-func (c *MainController) RechargeSunApi(userId, channel, pay_type int, amount float64) {
-	pay_order := payment.Create_order()
-	err := managers.SystemInstance.PreRecharge(userId, channel, pay_type, int(amount*100), pay_order)
-	if err != nil {
-		c.Data["json"] = c.jsonData(enums.DB_ACTION_ERROR)
-		c.Abort("10001")
-	}
-	//var action interface{}
-	switch channel {
-	default:
-		c.Abort("10002")
-		break
-	case 105:
-		result, err := sunapi.GetPayUrl(strconv.FormatFloat(amount, 'f', 2, 64), sunApiType(pay_type), pay_order, configs.Domain["domain"]+"notify/sun_api")
+		result, err := sunapi.GetPayUrl(strconv.FormatFloat(amount, 'f', 2, 64), sunApiType(payType), payOrder, configs.Domain["domain"]+"notify/sun_api")
 		if err != nil {
 			c.Ctx.WriteString(fmt.Sprintf("发生错误：%s", err.Error()))
 		}
@@ -397,6 +372,22 @@ func (c *MainController) GetPostForms() {
 	createPostForm(&c.baseController, formParams)
 	return
 }
+func (c *MainController) GeneralizeQr() {
+	agentId := c.Ctx.Input.Param(":agent")
+	templateId := c.Ctx.Input.Param(":id")
+	adUrl := getDownUrl() + "?id=" + agentId
+	img, _ := createQr(fmt.Sprintf("static/img/bg%s.png", templateId), adUrl)
+	//img, _ := createQr("static/img/bg.png", adUrl)
+	var b bytes.Buffer
+	jpeg.Encode(&b, img, &jpeg.Options{Quality: 75})
+	c.Ctx.Output.ContentType("jpeg")
+	c.Ctx.Output.Body(b.Bytes())
+	//encoder := png.Encoder{CompressionLevel: png.BestCompression}
+	//var b bytes.Buffer
+	//encoder.Encode(&b, img)
+	//c.Ctx.Output.ContentType("png")
+	//c.Ctx.Output.Body(b.Bytes())
+}
 
 func huiYiType(payType int) huiyi.PayType {
 	switch payType {
@@ -469,43 +460,4 @@ func sunApiType(payType int) sunapi.PayType {
 	default:
 		return sunapi.PAY_TYPE_ALIPAY
 	}
-}
-
-func (c *MainController) GeneralizeQr() {
-	agentId := c.Ctx.Input.Param(":agent")
-	templateId := c.Ctx.Input.Param(":id")
-	adUrl := configs.Domain["domain"] + "advertise?agentId=" + agentId
-	img, _ := c.createQr(fmt.Sprintf("static/img/bg%s.png", templateId), adUrl)
-	c.Ctx.Output.ContentType("png")
-	encoder := png.Encoder{CompressionLevel: png.BestCompression}
-	var b bytes.Buffer
-	encoder.Encode(&b, img)
-	c.Ctx.Output.Body(b.Bytes())
-}
-func (c *MainController) createQr(bgPath, info string) (newImg draw.Image, err error) {
-	bgFile, err := os.Open(bgPath)
-	defer bgFile.Close()
-	if err != nil {
-		return
-	}
-	logoFile, err := os.Open("static/img/logo.png")
-	defer logoFile.Close()
-	if err != nil {
-		return
-	}
-	bgImg, _ := png.Decode(bgFile)
-	logoImg, _ := png.Decode(logoFile)
-
-	qrCode, _ := qrcode.New(info, qrcode.Highest)
-	qrImg := qrCode.Image(232)
-	logoImgSize := qrImg.Bounds().Max.X / 4
-	logoImg = resize.Thumbnail(uint(logoImgSize), uint(logoImgSize), logoImg, resize.Lanczos3)
-	newImg = image.NewRGBA64(bgImg.Bounds())
-	global_offset_Y := 657
-	qrImg_offset := image.Pt(bgImg.Bounds().Max.X/2-qrImg.Bounds().Max.X/2, global_offset_Y-qrImg.Bounds().Max.Y/2)
-	logoImg_offset := qrImg_offset.Add(image.Pt(qrImg.Bounds().Max.X/2-logoImg.Bounds().Max.X/2, qrImg.Bounds().Max.Y/2-logoImg.Bounds().Max.Y/2))
-	draw.Draw(newImg, bgImg.Bounds(), bgImg, bgImg.Bounds().Min, draw.Over)
-	draw.Draw(newImg, qrImg.Bounds().Add(qrImg_offset), qrImg, qrImg.Bounds().Min, draw.Src)
-	draw.Draw(newImg, qrImg.Bounds().Add(logoImg_offset), logoImg, logoImg.Bounds().Min, draw.Src)
-	return
 }
