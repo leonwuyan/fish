@@ -38,6 +38,16 @@ func loadDownloadUrls() {
 		return
 	}
 }
+func saveDownloadUrls() {
+	data, err := json.Marshal(DownUrls)
+	if err != nil {
+		return
+	}
+	err = ioutil.WriteFile("conf/download.json", data, 0666)
+	if err != nil {
+		return
+	}
+}
 func init() {
 	loadPermissions()
 	loadDownloadUrls()

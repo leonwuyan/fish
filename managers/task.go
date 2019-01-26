@@ -101,3 +101,9 @@ func (this *TaskMgr) agentBind() (err error) {
 	}
 	return nil
 }
+func (this *TaskMgr) playerTax() (err error) {
+	return
+}
+func (this *TaskMgr) playerCash() (err error) {
+	return
+}
