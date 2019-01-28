@@ -5,6 +5,7 @@ import (
 	"fish/enums"
 	"fish/managers"
 	"fish/models"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"reflect"
 	"strconv"
@@ -37,7 +38,7 @@ func (c *AgentController) Prepare() {
 			c.Data["user"] = c.agent
 		}
 	}
-	managers.SystemInstance.PageVisitor(c.Ctx.Input, c.GetSession("agent"))
+	managers.SystemInstance.PageVisitor(c.Ctx.Input, fmt.Sprintf("id:%d,name:%s", c.agent.Id, c.agent.Name))
 }
 func (c *AgentController) Index() {
 	if c.Ctx.Input.IsPost() {

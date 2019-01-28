@@ -5,6 +5,7 @@ import (
 	"fish/enums"
 	"fish/managers"
 	"fish/models"
+	"fmt"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
 	"github.com/gorilla/websocket"
@@ -14,9 +15,6 @@ import (
 	"time"
 )
 
-var IsRunning = false
-var clients map[*websocket.Conn]string
-
 type AdminController struct {
 	baseController
 	baseUrl   string
@@ -24,9 +22,6 @@ type AdminController struct {
 	wsUpgrade websocket.Upgrader
 }
 
-func init() {
-	clients = make(map[*websocket.Conn]string)
-}
 func (c *AdminController) verify_page(code int) {
 	if !verifyPower(c.admin, code) {
 		c.Abort("10003")
@@ -48,15 +43,6 @@ func (c *AdminController) Prepare() {
 	if !strings.Contains(c.Ctx.Input.URL(), "login") {
 		c.Layout = "LayoutAdmin.tpl"
 		if !c.checkSession() {
-			if c.Ctx.Request.Header.Get("Upgrade") == "websocket" {
-				//println(c.Ctx.Request.Header.Get("Upgrade"))
-				ws, err := c.wsUpgrade.Upgrade(c.Ctx.ResponseWriter, c.Ctx.Request, nil)
-				if err != nil {
-					logs.Error(err)
-				}
-				ws.WriteJSON(c.jsonData(enums.ADMIN_NOT_LOGIN))
-				ws.Close()
-			}
 			if c.Ctx.Input.IsPost() || c.Ctx.Input.IsPut() {
 				c.Data["json"] = c.jsonData(enums.ADMIN_NOT_LOGIN)
 				c.ServeJSON()
@@ -68,7 +54,7 @@ func (c *AdminController) Prepare() {
 			c.Data["user"] = c.admin
 		}
 	}
-	managers.SystemInstance.PageVisitor(c.Ctx.Input, c.GetSession("admin"))
+	managers.SystemInstance.PageVisitor(c.Ctx.Input, fmt.Sprintf("id:%d,name:%s", c.admin.Id, c.admin.Name))
 }
 func (c *AdminController) Index() {
 	o := orm.NewOrm()
@@ -108,41 +94,19 @@ func (c *AdminController) Index() {
 	}
 }
 func (c *AdminController) SysMessage() {
-	c.TplName = "index.tpl"
-	ws, err := c.wsUpgrade.Upgrade(c.Ctx.ResponseWriter, c.Ctx.Request, nil)
-	if err != nil {
-		logs.Error(err)
+	cashApply, chat := managers.AdminInstance.IsNewMessage()
+	var messages []models.ClientMessage
+	if cashApply > 0 {
+		messages = append(messages, models.ClientMessage{0, "有新的提现申请，请尽快处理"})
 	}
-	clients[ws] = c.Ctx.Input.IP()
-	if !IsRunning {
-		go c.handlerClientMessage()
-		IsRunning = true
+	if chat > 0 {
+		messages = append(messages, models.ClientMessage{1, "有新的玩家消息，请尽快处理"})
 	}
-}
-func (c *AdminController) handlerClientMessage() {
-	for {
-		cashApply, chat := managers.AdminInstance.IsNewMessage()
-		var messages []models.Result
-		if cashApply > 0 {
-			messages = append(messages, c.jsonData(enums.SUCCESS, models.ClientMessage{0, "有新的提现申请，请尽快处理"}))
-		}
-		if chat > 0 {
-			messages = append(messages, c.jsonData(enums.SUCCESS, models.ClientMessage{1, "有新的玩家消息，请尽快处理"}))
-		}
-		if len(messages) == 0 {
-			messages = append(messages, c.jsonData(enums.SUCCESS, models.ClientMessage{2, "暂无新的消息"}))
-		}
-		//清理客户端连接
-		//println(len(clients))
-		for client, _ := range clients {
-			for _, msg := range messages {
-				if client.WriteJSON(msg) != nil {
-					delete(clients, client)
-				}
-			}
-		}
-		time.Sleep(time.Duration(5) * time.Second)
+	if len(messages) == 0 {
+		messages = append(messages, models.ClientMessage{2, "暂无新的消息"})
 	}
+	c.Data["json"] = c.jsonData(enums.SUCCESS, messages)
+	c.ServeJSON()
 }
 
 //游戏配置
