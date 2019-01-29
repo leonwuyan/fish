@@ -71,40 +71,40 @@ const (
 type BankType int
 
 const (
-	_        BankType = iota
-	ICBC     BankType = 1
-	ABC      BankType = 2
-	BOC      BankType = 3
-	CCB      BankType = 4
-	CMB      BankType = 5
-	COMM     BankType = 6
-	CEB      BankType = 7
-	HXB      BankType = 8
-	GDB      BankType = 9
-	BCCB     BankType = 10
-	BJRCB    BankType = 11
-	BOS      BankType = 12
-	SHRCB    BankType = 13
-	CBHB     BankType = 14
-	HCCB     BankType = 15
-	GZCB     BankType = 16
-	CITIC    BankType = 17
-	PSBC     BankType = 18
-	CIB      BankType = 19
-	CMBC     BankType = 20
-	SZPAB    BankType = 21
-	SPDB     BankType = 22
-	URCB     BankType = 23
-	NBCB     BankType = 24
-	NJCB     BankType = 25
-	WZCB     BankType = 26
-	CSCB     BankType = 27
-	CYB      BankType = 28
-	CZB      BankType = 29
-	CZCB     BankType = 30
-	GNXS     BankType = 31
-	HKBCHINA BankType = 32
-	ALIPAY   BankType = 33
+	_             BankType = iota
+	BANK_ICBC     BankType = 1
+	BANK_ABC      BankType = 2
+	BANK_BOC      BankType = 3
+	BANK_CCB      BankType = 4
+	BANK_CMB      BankType = 5
+	BANK_COMM     BankType = 6
+	BANK_CEB      BankType = 7
+	BANK_HXB      BankType = 8
+	BANK_GDB      BankType = 9
+	BANK_BCCB     BankType = 10
+	BANK_BJRCB    BankType = 11
+	BANK_BOS      BankType = 12
+	BANK_SHRCB    BankType = 13
+	BANK_CBHB     BankType = 14
+	BANK_HCCB     BankType = 15
+	BANK_GZCB     BankType = 16
+	BANK_CITIC    BankType = 17
+	BANK_PSBC     BankType = 18
+	BANK_CIB      BankType = 19
+	BANK_CMBC     BankType = 20
+	BANK_SZPAB    BankType = 21
+	BANK_SPDB     BankType = 22
+	BANK_URCB     BankType = 23
+	BANK_NBCB     BankType = 24
+	BANK_NJCB     BankType = 25
+	BANK_WZCB     BankType = 26
+	BANK_CSCB     BankType = 27
+	BANK_CYB      BankType = 28
+	BANK_CZB      BankType = 29
+	BANK_CZCB     BankType = 30
+	BANK_GNXS     BankType = 31
+	BANK_HKBCHINA BankType = 32
+	BANK_ALIPAY   BankType = 33
 )
 
 type AdminActionType int
@@ -131,7 +131,7 @@ const (
 type GoldChangeType int
 
 const (
-	GOLD_CHANGE_GAME_CATCH_FISH    GoldChangeType = 1  //2.捕鱼游戏输赢
+	GOLD_CHANGE_GAME_CATCH_FISH    GoldChangeType = 1  // 1.捕鱼游戏输赢
 	GOLD_CHANGE_GAME_GOLDEN_FLOWER GoldChangeType = 2  // 2.金花游戏输赢
 	GOLD_CHANGE_GAME_DOUDIZU       GoldChangeType = 3  // 3.斗地主输赢
 	GOLD_CHANGE_GAME_NIUNIU_M      GoldChangeType = 4  // 4.百人牛牛输赢
