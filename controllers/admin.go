@@ -208,12 +208,20 @@ func (c *AdminController) NoticeList() {
 func (c *AdminController) NoticeInfo() {
 	c.verify_page(configs.AdminPower["系统"]["公告配置"])
 	id, _ := c.GetInt("id")
-	agent, err := managers.AdminInstance.GetShowAgentInfo(id)
+	notice, err := managers.AdminInstance.GetShowAgentInfo(id)
 	if err != nil {
 		c.Data["err"] = enums.QUERY_DATA_ERROR.String()
 		logs.Error(err)
 	} else {
-		c.Data["data"] = agent
+		c.Data["data"] = notice
+	}
+	if c.Ctx.Input.IsPut() {
+		id, _ := c.GetInt("id")
+		data := models.Notice{
+			Id: id,
+		}
+		c.Data["json"] = c.jsonData(managers.AdminInstance.ChangeNotice(data))
+		c.ServeJSON()
 	}
 }
 

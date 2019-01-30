@@ -30,6 +30,12 @@
                                    placeholder="请输入代理ID">
                         </div>
                         <div class="form-group input-group">
+                            <select id="finished" name="finished" class="form-control">
+                                <option value="1" selected>已支付</option>
+                                <option value="0">未支付</option>
+                            </select>
+                        </div>
+                        <div class="form-group input-group">
                             <select id="recharge_type" name="recharge_type" class="form-control">
                                 <option value="0">全部</option>
                                 <option value="100">玩家充值</option>
@@ -64,7 +70,8 @@
         {title: '单号', field: 'transaction_id'},
         {title: '方式', field: 'recharge_type', formatter: fishApp.formatter.rechargeType},
         {title: '金额', field: 'gold_change', formatter: fishApp.formatter.gold},
-        {title: '充值时间', field: 'recharge_time'},
+        {title: '订单时间', field: 'recharge_time'},
+        {title: '是否支付', field: 'finished', formatter: function (value) {return value === 0 ? "未支付" : "已支付";}},
         {title: '是否到账', field: 'is_send'},
         {title: '到账时间', field: 'send_time'},
     ];

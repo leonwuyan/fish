@@ -3,7 +3,6 @@ package managers
 import (
 	"encoding/json"
 	"fish/enums"
-	"fish/fishServer"
 	"fish/models"
 	"fish/payment"
 	"github.com/astaxie/beego/logs"
@@ -303,48 +302,17 @@ func (this *AdminMgr) StatisticsPlay(begin, end time.Time) (total int64, result 
 	o.Raw("SELECT GameId,COUNT(DISTINCT GameLogId) as PlayTimes,COUNT(DISTINCT UserId) as PlayPlayers,SUM(GoldChange) as WinOrLose from playlog where CreateTime BETWEEN ? AND ? GROUP BY GameId").SetArgs(begin, end).QueryRows(&result)
 	return
 }
-func (this *AdminMgr) StatisticsTax(begin, end time.Time) (data map[string]interface{}, err error) {
-	//sysWin, sysFee := this.getSystemWin(begin, end)
-	//sysWinA, sysFeeA := this.getHasAgentSystemWin(begin, end)
-	//agentFee := this.getAgentFee(begin, end)
-	//agentTax := this.getAgentTax(begin, end)
-	//sysAward := this.getSystemAward(begin, end)
-	//sysPunish := this.getSystemPunish(begin, end)
-	//playerRecharge := this.getPlayerRecharge(begin, end)
-	//playerCash := this.getPlayerCash(begin, end)
-	//playerRemain := this.getPlayerRemain()
-	//sysWinO := sysWin - sysWinA
-	//sysFeeO := sysFee - sysFeeA
-	//data = make(map[string]interface{})
-	//data["sysWin"] = sysWin
-	//data["sysFee"] = sysFee
-	//data["sysAward"] = sysAward
-	//data["sysPunish"] = sysPunish
-	//data["sysWinA"] = sysWinA
-	//data["sysFeeA"] = sysFeeA
-	//data["sysWinO"] = sysWinO
-	//data["sysFeeO"] = sysFeeO
-	//data["agentTax"] = agentTax
-	//data["playerRecharge"] = playerRecharge
-	//data["playerCash"] = playerCash
-	//data["playerRemain"] = playerRemain
-	//hasAgentWin := float64(sysWinA) + float64(sysFeeA) - agentFee
-	//noAgentWin := float64(sysWinO + sysFeeO + sysPunish)
-	//we := hasAgentWin*0.35 + (agentFee-agentTax)*0.5 + noAgentWin*0.5
-	//println(data)
-	//println(fmt.Sprintf("%f", we))
-	return
-}
 
 func (this *AdminMgr) GetRechargeLogs(account models.AdminAccount, pageSize, pageIndex int, searchParams string) (total int64, rechargeLogs []models.RechargeLog, err error) {
 	o := orm.NewOrm()
 	rs := o.QueryTable(new(models.RechargeLog))
-	var id, agent_id, rechargeType string
+	var id, agent_id, rechargeType, finished string
 	if len(searchParams) > 0 {
 		var map_params map[string]string
 		if err = json.Unmarshal([]byte(searchParams), &map_params); err == nil {
 			id = map_params["id"]
 			agent_id = map_params["agent_id"]
+			finished = map_params["finished"]
 			rechargeType = map_params["recharge_type"]
 			begin := map_params["begin"]
 			end := map_params["end"]
@@ -368,7 +336,7 @@ func (this *AdminMgr) GetRechargeLogs(account models.AdminAccount, pageSize, pag
 			rs = rs.Filter("RechargeType", rechargeType)
 		}
 	}
-	rs = rs.Filter("Finished", 1)
+	rs = rs.Filter("Finished", finished)
 	total, _ = rs.Count()
 	if total > 0 {
 		_, err = rs.Limit(pageSize, (pageIndex-1)*pageSize).OrderBy("-Id").All(&rechargeLogs)
@@ -559,9 +527,9 @@ func (this *AdminMgr) GetAgentTax(begin, end time.Time) (tax float64) {
 	o.Raw("SELECT SUM(fee) FROM agent_fee_log WHERE log_time BETWEEN ? AND ?", begin, end).QueryRow(&tax)
 	return
 }
-func (this *AdminMgr) GetSystemAward(begin, end time.Time) (punish int) {
+func (this *AdminMgr) GetSystemAward(begin, end time.Time) (award int) {
 	o := orm.NewOrm()
-	o.Raw("SELECT SUM(GoldChange) FROM goldchangelog WHERE ChangeType=9 AND ChangeTime BETWEEN ? AND ?", begin, end).QueryRow(&punish)
+	o.Raw("SELECT SUM(GoldChange) FROM goldchangelog WHERE ChangeType=9 AND ChangeTime BETWEEN ? AND ?", begin, end).QueryRow(&award)
 	return
 }
 func (this *AdminMgr) GetPlayerRecharge(begin, end time.Time) (gold int) {
@@ -615,11 +583,9 @@ func (this *AdminMgr) GetChannelInfo(id int) (channel models.Channel, err error)
 	return
 }
 func (this *AdminMgr) ChangeChannelInfo(data models.Channel) enums.ReturnCode {
-	o := orm.NewOrm()
-	if _, err := o.Update(&data, "Remarks", "QQ", "WenXin", "ShowInGame"); err != nil {
+	if ServerInstance.ChangeChannelInfo(data) != nil {
 		return enums.DB_ACTION_ERROR
 	}
-	fishServer.FishInstance.ChangeChannelConfig(data.ChannelId, false)
 	return enums.SUCCESS
 }
 func (this *AdminMgr) GetAllShowAgents(account models.AdminAccount, pageSize, pageIndex int, searchParams string) (total int64, agents []models.AgentShow, err error) {
@@ -635,13 +601,17 @@ func (this *AdminMgr) GetShowAgentInfo(id int) (agent models.AgentShow, err erro
 	return
 }
 func (this *AdminMgr) ChangeShowAgentInfo(data models.AgentShow) enums.ReturnCode {
-	o := orm.NewOrm()
-	if _, err := o.Update(&data, "Remarks", "QQ", "WenXin", "ShowInGame"); err != nil {
+	if ServerInstance.ChangeShowAgent(data) != nil {
 		return enums.DB_ACTION_ERROR
 	}
-	fishServer.FishInstance.ChangeAgentConfig(data.AgentId, false)
 	return enums.SUCCESS
 }
 func (this *AdminMgr) GetNotice() {
 
+}
+func (this *AdminMgr) ChangeNotice(data models.Notice) enums.ReturnCode {
+	if ServerInstance.ChangeNotice(data) != nil {
+		return enums.DB_ACTION_ERROR
+	}
+	return enums.SUCCESS
 }
