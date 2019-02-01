@@ -11,6 +11,7 @@ func init() {
 	//推广
 	beego.Router("/advertise", &controllers.MainController{}, "*:Advertise")
 	beego.Router("/advertise/:agent([0-9]+)_:id([0-9]+).png", &controllers.MainController{}, "*:GeneralizeQr")
+	beego.Router("/advertise/:agent([0-9]+)_:id([0-9]+).jpg", &controllers.MainController{}, "*:GeneralizeQr")
 	//充值
 	beego.Router("/pay", &controllers.MainController{}, "*:Recharge")
 	//beego.Router("/pay", &controllers.MainController{}, "*:RechargeHuiYi")

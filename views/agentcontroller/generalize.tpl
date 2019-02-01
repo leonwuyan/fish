@@ -30,19 +30,19 @@
             <div class="panel-body">
                 <h4>您的推广二维码：</h4>
                 <div id="canbox0" class="canbox">
-                    <img src="{{.domain}}advertise/{{.user.Id}}_0.png" width="240" height="400">
+                    <img src="{{.domain}}advertise/{{.user.Id}}_0.jpg" width="240" height="400">
                     <button class="btn btn-info" onclick="downLoad(0)">立即保存</button>
                 </div>
                 <div id="canbox1" class="canbox">
-                    <img src="{{.domain}}advertise/{{.user.Id}}_1.png" width="240" height="400">
+                    <img src="{{.domain}}advertise/{{.user.Id}}_1.jpg" width="240" height="400">
                     <button class="btn btn-info" onclick="downLoad(1)">立即保存</button>
                 </div>
                 <div id="canbox2" class="canbox">
-                    <img src="{{.domain}}advertise/{{.user.Id}}_2.png" width="240" height="400">
+                    <img src="{{.domain}}advertise/{{.user.Id}}_2.jpg" width="240" height="400">
                     <button class="btn btn-info" onclick="downLoad(2)">立即保存</button>
                 </div>
                 <div id="canbox3" class="canbox">
-                    <img src="{{.domain}}advertise/{{.user.Id}}_3.png" width="240" height="400">
+                    <img src="{{.domain}}advertise/{{.user.Id}}_3.jpg" width="240" height="400">
                     <button class="btn btn-info" onclick="downLoad(3)">立即保存</button>
                 </div>
             </div>
@@ -53,6 +53,6 @@
     var clipboard = new Clipboard('.copy');
 
     function downLoad(id) {
-        window.open("{{.domain}}advertise/{{.user.Id}}_" + id + ".png")
+        window.open("{{.domain}}advertise/{{.user.Id}}_" + id + ".jpg")
     }
 </script>
