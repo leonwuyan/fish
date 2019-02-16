@@ -126,6 +126,7 @@ const (
 	PAY_CHANNEL_YIJIA    PaymentChannel = 5
 	PAY_CHANNEL_ALIPAY   PaymentChannel = 6
 	PAY_CHANNEL_SUNAPI   PaymentChannel = 7
+	PAY_CHANNEL_FEITIAN  PaymentChannel = 8
 )
 
 type GoldChangeType int

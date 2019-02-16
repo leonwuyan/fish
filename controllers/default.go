@@ -7,6 +7,7 @@ import (
 	"fish/enums"
 	"fish/managers"
 	"fish/payment"
+	"fish/payment/feitian"
 	"fish/payment/hongjia"
 	"fish/payment/huiyi"
 	"fish/payment/sunapi"
@@ -112,6 +113,9 @@ func (c *MainController) RechargeHandler(payChannel enums.PaymentChannel, userId
 	case enums.PAY_CHANNEL_SUNAPI:
 		c.Recharge_Sun_Api(userId, channel, payType, amount, pay_order)
 		break
+	case enums.PAY_CHANNEL_FEITIAN:
+		c.Recharge_Fei_Tian(userId, channel, payType, amount, pay_order)
+		break
 	}
 }
 func (c *MainController) Recharge_Hui_Yi(userId, channel, payType int, amount float64, payOrder string) {
@@ -184,6 +188,28 @@ func (c *MainController) Recharge_Sun_Api(userId, channel, payType int, amount f
 			c.Redirect(result.Result, 302)
 		} else {
 			c.Ctx.WriteString(result.Msg)
+		}
+		break
+	}
+}
+func (c *MainController) Recharge_Fei_Tian(userId, channel, payType int, amount float64, payOrder string) {
+	switch channel {
+	default:
+		c.Abort("10002")
+		break
+	case 105:
+		result, err := feitian.GetApiUrl(strconv.Itoa(int(amount*100)), feiTianType(payType), payOrder, configs.Domain["domain"]+"notify/fei_tian")
+		if err != nil {
+			c.Ctx.WriteString(fmt.Sprintf("发生错误：%s", err.Error()))
+		}
+		//c.Ctx.WriteString(fmt.Sprintf("%v", result))
+		resultMap := result.REP_BODY.(map[string]interface{})
+		if resultMap["rspcode"].(string) == "000000" {
+			c.Redirect(resultMap["codeUrl"].(string), 302)
+		} else {
+			var dst []byte
+			fmt.Sscanf(resultMap["rspmsg"].(string), "%X", &dst)
+			c.Ctx.WriteString(string(dst))
 		}
 		break
 	}
@@ -300,6 +326,23 @@ func (c *MainController) Notify_Sun_Api() {
 	result := sunapi.Notify(params)
 	if result == "success" {
 		managers.SystemInstance.FinishRecharge(params["outTradeNo"])
+	}
+	c.Ctx.WriteString(result)
+}
+func (c *MainController) Notify_Fei_Tian() {
+	jsonData, _ := ioutil.ReadAll(c.Ctx.Request.Body)
+	logs.Info(jsonData)
+	params := make(map[string]string)
+	err := json.Unmarshal(jsonData, &params)
+	if err != nil {
+		logs.Error(err)
+		c.Ctx.WriteString("json parse fail")
+		return
+	}
+	logs.Info(params)
+	result := feitian.NotifyResult(params)
+	if result == "SUCCESS" {
+		managers.SystemInstance.FinishRecharge(params["orderId"])
 	}
 	c.Ctx.WriteString(result)
 }
@@ -459,5 +502,17 @@ func sunApiType(payType int) sunapi.PayType {
 		//	return yijia.PAY_TYPE_BANK
 	default:
 		return sunapi.PAY_TYPE_ALIPAY
+	}
+}
+func feiTianType(payType int) feitian.PayType {
+	switch payType {
+	case 22:
+		return feitian.PAY_TYPE_ALIPAY
+	case 30:
+		return feitian.PAY_TYPE_WECHAT
+	case 23:
+		return feitian.PAY_TYPE_BANK
+	default:
+		return feitian.PAY_TYPE_ALIPAY
 	}
 }

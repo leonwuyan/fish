@@ -27,7 +27,6 @@ var cpt *captcha.Captcha
 
 type baseController struct {
 	beego.Controller
-	sc_Chan chan models.Result
 }
 
 func init() {

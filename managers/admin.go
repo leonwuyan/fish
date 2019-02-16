@@ -7,7 +7,6 @@ import (
 	"fish/payment"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/orm"
-	"math"
 	"strconv"
 	"time"
 )
@@ -440,7 +439,7 @@ func (this *AdminMgr) GetSystemWin(begin, end time.Time) (sysWin, sysFee int) {
 	kingQueenWin += kingQueenFee
 	niuNiuZWin += niuNiuZFee
 	dragonTigerWin += dragonTigerFee
-	sysWin = math.AbsInt(catchFishWin + goldenFlowerWin + douDiZuWin + niuNiuMWin + kingQueenWin + niuNiuZWin + dragonTigerWin)
+	sysWin = -(catchFishWin + goldenFlowerWin + douDiZuWin + niuNiuMWin + kingQueenWin + niuNiuZWin + dragonTigerWin)
 	//logs.Info(fmt.Sprintf("noAgent#catchFishWin:%d,goldenFlowerWin:%d,douDiZuWin:%d,niuNiuMWin:%d,kingQueenWin:%d,niuNiuZWin:%d,dragonTigerWin:%d",catchFishWin,goldenFlowerWin,douDiZuWin,niuNiuMWin,kingQueenWin,niuNiuZWin,dragonTigerWin))
 	sysFee = catchFishFee + goldenFlowerFee + douDiZuFee + niuNiuMFee + kingQueenFee + niuNiuZFee + dragonTigerFee
 	//logs.Info(fmt.Sprintf("noAgent#catchFishFee:%d,goldenFlowerFee:%d,douDiZuFee:%d,niuNiuMFee:%d,kingQueenFee:%d,niuNiuZFee:%d,dragonTigerFee:%d",catchFishFee,goldenFlowerFee,douDiZuFee,niuNiuMFee,kingQueenFee,niuNiuZFee,dragonTigerFee))
@@ -511,7 +510,7 @@ func (this *AdminMgr) GetHasAgentSystemWin(begin, end time.Time) (sysWin, sysFee
 	kingQueenWin += kingQueenFee
 	niuNiuZWin += niuNiuZFee
 	dragonTigerWin += dragonTigerFee
-	sysWin = math.AbsInt(catchFishWin + goldenFlowerWin + douDiZuWin + niuNiuMWin + kingQueenWin + niuNiuZWin + dragonTigerWin)
+	sysWin = -(catchFishWin + goldenFlowerWin + douDiZuWin + niuNiuMWin + kingQueenWin + niuNiuZWin + dragonTigerWin)
 	//logs.Info(fmt.Sprintf("hasAgent#catchFishWin:%d,goldenFlowerWin:%d,douDiZuWin:%d,niuNiuMWin:%d,kingQueenWin:%d,niuNiuZWin:%d,dragonTigerWin:%d",catchFishWin,goldenFlowerWin,douDiZuWin,niuNiuMWin,kingQueenWin,niuNiuZWin,dragonTigerWin))
 	sysFee = catchFishFee + goldenFlowerFee + douDiZuFee + niuNiuMFee + kingQueenFee + niuNiuZFee + dragonTigerFee
 	//logs.Info(fmt.Sprintf("hasAgent#catchFishFee:%d,goldenFlowerFee:%d,douDiZuFee:%d,niuNiuMFee:%d,kingQueenFee:%d,niuNiuZFee:%d,dragonTigerFee:%d",catchFishFee,goldenFlowerFee,douDiZuFee,niuNiuMFee,kingQueenFee,niuNiuZFee,dragonTigerFee))
