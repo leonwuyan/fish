@@ -34,7 +34,7 @@ const (
 type PayType string
 
 const (
-	PAY_TYPE_ALIPAY PayType = "ALIWAPPAY"
+	PAY_TYPE_ALIPAY PayType = "ALIPAY"
 	PAY_TYPE_WECHAT PayType = "WXPAY"
 	PAY_TYPE_BANK   PayType = "CPPAY"
 )
