@@ -331,16 +331,21 @@ func (c *MainController) Notify_Sun_Api() {
 }
 func (c *MainController) Notify_Fei_Tian() {
 	jsonData, _ := ioutil.ReadAll(c.Ctx.Request.Body)
-	logs.Info(jsonData)
-	params := make(map[string]string)
-	err := json.Unmarshal(jsonData, &params)
+	//jsonData := []byte("{\"REP_HEAD\":{\"sign\":\"VCV0IlJLYxixKNmHnMfX9LkxqVBdElYE0cFOmZLJBzYgG14ra7h4EyeeDf9MYX5RFwmfNl37NbOVRuGIgk1uvDEhdM/J3HZZO0sBiDVfi/b24QIUuVeEadoscZVFiyHEPFQSWFecAx/e1cbzYAQj0OBsg094kdhWaNJD1dDcAFNtLf0sP6DbPhfH2v009dT/kHwkCxjAmPweCxHQ2DtHSOcdyrq8NfkFVVPxe1zwegShhVfhMzNxTAHNGOTqni8zdyRUvIdn0AhBPwfvAZcYYKr9HOqaRPInogb8MUZ1NS1Jw9v69LK/9JPShhV/PQtPtSfgmMvxmaZ9TtDd9pSEWA==\"},\"REP_BODY\":{\"orderState\":\"01\",\"tranSeqId\":\"190202651219021814434563579O0Obe\",\"payTime\":\"20190218144859\",\"orderAmt\":\"1000\",\"orderId\":\"20190218144345540\"}}")
+	repData := make(map[string]interface{})
+	err := json.Unmarshal(jsonData, &repData)
 	if err != nil {
 		logs.Error(err)
 		c.Ctx.WriteString("json parse fail")
 		return
 	}
-	logs.Info(params)
-	result := feitian.NotifyResult(params)
+	headData := repData["REP_HEAD"].(map[string]interface{})
+	bodyData := repData["REP_BODY"].(map[string]interface{})
+	params := make(map[string]string)
+	for k, v := range bodyData {
+		params[k] = v.(string)
+	}
+	result := feitian.NotifyResult(headData["sign"].(string), params)
 	if result == "SUCCESS" {
 		managers.SystemInstance.FinishRecharge(params["orderId"])
 	}

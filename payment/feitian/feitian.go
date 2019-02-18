@@ -35,7 +35,7 @@ type PayType string
 
 const (
 	PAY_TYPE_ALIPAY PayType = "ALIWAPPAY"
-	PAY_TYPE_WECHAT PayType = "WXWAPPAY"
+	PAY_TYPE_WECHAT PayType = "WXPAY"
 	PAY_TYPE_BANK   PayType = "CPPAY"
 )
 
@@ -124,6 +124,20 @@ func rsaEncrypt(origData []byte) (out []byte, err error) {
 	signature2, err := rsa.SignPKCS1v15(rand.Reader, priv.(*rsa.PrivateKey), crypto.SHA256, hashed) //签名
 	return signature2, err
 }
+func RsaVerySignWithSha1Base64(originalData, signData, pubKey string) error {
+	sign, err := base64.StdEncoding.DecodeString(signData)
+	if err != nil {
+		return err
+	}
+	public, _ := base64.StdEncoding.DecodeString(pubKey)
+	pub, err := x509.ParsePKIXPublicKey(public)
+	if err != nil {
+		return err
+	}
+	hash := sha256.New()
+	hash.Write([]byte(originalData))
+	return rsa.VerifyPKCS1v15(pub.(*rsa.PublicKey), crypto.SHA256, hash.Sum(nil), sign)
+}
 func create_md5(sign string) (s string) {
 	data := []byte(sign)
 	has := md5.Sum(data)
@@ -154,14 +168,11 @@ func GetApiUrl(amount string, payType PayType, order, notify string) (result Rec
 	}
 	return getPayUrlFromServer(postData)
 }
-func NotifyResult(params map[string]string) string {
-	if params["rspcode"] == "000000" {
-		sign := makeSign(params)
-		if params["sign"] == sign {
-			println(params["orderState"])
-			if params["orderState"] == "01" {
-				return "SUCCESS"
-			}
+func NotifyResult(rsaSign string, params map[string]string) string {
+	sign := makeSign(params)
+	if RsaVerySignWithSha1Base64(sign, rsaSign, publicKey) == nil {
+		if params["orderState"] == "01" {
+			return "SUCCESS"
 		}
 	}
 	return ""
